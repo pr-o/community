@@ -7,18 +7,22 @@
     "build": "next build",
     "start": "next start",
     "test": "jest --runInBand",
-    "pretest": "yarn run lint",
-    "git-reset": "git reset --hard HEAD",
-    "git-clean": "git clean -d -x -e node_modules -e packages -f",
-    "lint": "yarn lint-typescript && yarn lint-eslint",
-    "lint-fix": "yarn prettier-fix && eslint . --ext js,jsx,ts,tsx --fix --max-warnings=0",
-    "lint-eslint": "eslint . --ext js,jsx,ts,tsx --max-warnings=0",
-    "lint-typescript": "tsc --noEmit",
-    "prettier-check": "prettier --check .",
-    "prettier-fix": "prettier --write .",
-    "lint-staged": "lint-staged"
+    "pretest": "yarn lint",
+    "git:reset": "git reset --hard HEAD",
+    "git:clean": "git clean -d -x -e node_modules -f",
+    "lint": "eslint . --ext js,jsx,ts,tsx --max-warnings=0",
+    "lint:fix": "eslint . --ext js,jsx,ts,tsx --fix",
+    "lint:javascript": "eslint . --ext js,jsx --max-warnings=0",
+    "lint:typescript": "eslint . --ext ts,tsx --max-warnings=0",
+    "prettier:check": "prettier --check .",
+    "prettier:fix": "prettier --write ."
   },
-  "pre-commit": "lint-staged",
+  "husky": {
+    "hooks": {
+      "pre-push": "yarn test",
+      "pre-commit": "lint-staged"
+    }
+  },
   "dependencies": {
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^11.3.0",
@@ -48,6 +52,7 @@
     "lint-staged": "^11.0.0",
     "pre-commit": "^1.2.2",
     "prettier": "^2.3.0",
+    "shell-quote": "^1.7.2",
     "typescript": "4.3.2"
   }
 }
