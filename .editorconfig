@@ -13,8 +13,8 @@ quote_type = single
 
 [*.{py,go}]
 indent_size = 4
-indent_style = space
+indent_style = tab
 
 [*.{json,gyp,yml,yaml,md}]
 indent_size = 2
-indent_style = space
+indent_style = tab
