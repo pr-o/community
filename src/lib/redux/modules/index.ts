@@ -10,7 +10,7 @@ export const combinedReducer = combineReducers({
 	theme: themeReducer
 });
 
-export const rootReducer = (state, action) => {
+export const rootReducer = (state: any, action: any) => {
 	if (action.type === HYDRATE) {
 		const nextState = {
 			...state, // use previous state
