@@ -1,5 +1,4 @@
 # Community
 
 - Build it!
-- https://community-sung.vercel.app/
-- 
+- https://community-pro.vercel.app/
