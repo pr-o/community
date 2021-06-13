@@ -13,7 +13,6 @@
       "interfaces/*": ["src/interfaces/*"],
       "lib/*": ["src/lib/*"],
       "pages/*": ["src/pages/*"],
-      "styles/*": ["src/styles/*"],
       "tests/*": ["src/tests/*"],
     },
     "allowJs": true,
@@ -42,7 +41,6 @@
   ],
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
+    "src/**/*",
   ],
 }

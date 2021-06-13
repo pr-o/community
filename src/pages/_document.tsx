@@ -6,22 +6,18 @@ import Document, {
 	Main,
 	NextScript
 } from 'next/document';
-import { ServerStyleSheets } from '@material-ui/core/styles';
+import { ServerStyleSheets } from '@material-ui/core/styles'
 
 const themeColor = '#008080'
-
 class MyDocument extends Document {
 	render() {
 		return (
 			<Html lang="en">
 				<Head />
 				<meta name="theme-color" content={themeColor} />
-				<link
-					rel="stylesheet"
-					href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-				/>
+				<link rel="stylesheet" href="/styles/globals.css" />
 				<body>
-					<div id="page-transition" />
+					<div id="route-transition" />
 					<Main />
 					<NextScript />
 				</body>

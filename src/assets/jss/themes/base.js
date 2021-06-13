@@ -129,6 +129,7 @@ export const hexToRgb = (input) => {
 };
 
 export const body = (theme) => css`
+	color: ${theme.text};
 	background: ${theme.bodyBackground};
 	transition-duration: 1s;
 	transition-property: background-color, color;
@@ -155,7 +156,7 @@ export const container = (theme) => css`
 		max-width: 1140px;
 	}
 	padding: 0 15px;
-	margin: 0 auto;
+	margin: 0 auto 60px;
 	width: 100%;
 	z-index: 1;
 `;
@@ -188,6 +189,20 @@ export const mainRaised = (theme) => css`
 	box-shadow: 0 16px 24px 2px rgba(${hexToRgb(theme.background)}, 0.14),
 		0 6px 30px 5px rgba(${hexToRgb(theme.background)}, 0.12),
 		0 8px 10px -5px rgba(${hexToRgb(theme.background)}, 0.2);
+	transition-duration: 0.5s;
+	transition-property: background-color, color;
+`;
+
+export const preFooter = (theme) => css`
+	color: ${theme.text};
+	background: ${theme.background};
+	text-align: center;
+	padding: 50px 0px;
+	margin: 50px 0;
+	h2 {
+		font-weight: 500;
+		margin-bottom: 50px;
+	}
 	transition-duration: 0.5s;
 	transition-property: background-color, color;
 `;
