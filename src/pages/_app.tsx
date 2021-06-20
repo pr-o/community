@@ -9,6 +9,7 @@ import { RootState } from 'lib/redux/modules';
 import { ThemeProvider } from '@emotion/react';
 import { lightTheme, darkTheme } from 'assets/jss/themes';
 import RouteChange from "components/RouteChange/RouteChange";
+import 'styles/globals.css'
 
 const showTransitionAnimation = (path: string) => {
 	ReactDOM.render(
@@ -68,6 +69,8 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
 					name="description"
 					content="Online community for ..."
 				/>
+				<meta name="theme-color" content="#008080" />
+				<link rel="preload" type="text/css" href="styles/globals.css" />
 				<link rel="shortcut icon" href="/favicon.png" />
 				<link rel="apple-touch-icon" sizes="76x76" href="apple-icon" />
 				<title>{` ❤️ `} Community</title>
