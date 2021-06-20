@@ -8,14 +8,19 @@ import Document, {
 } from 'next/document';
 import { ServerStyleSheets } from '@material-ui/core/styles'
 
-const themeColor = '#008080'
 class MyDocument extends Document {
 	render() {
 		return (
 			<Html lang="en">
-				<Head />
-				<meta name="theme-color" content={themeColor} />
-				<link rel="stylesheet" href="/styles/globals.css" />
+				<Head>
+					{/* <link
+						rel="preload"
+						href="/fonts/yourfont/yourfont.woff2"
+						as="font"
+						type="font/woff2"
+						crossOrigin
+					/> */}
+				</Head>
 				<body>
 					<div id="route-transition" />
 					<Main />

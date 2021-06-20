@@ -8,15 +8,14 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Header from 'components/Header/Header'
 
+const BRAND = 'Community'
 const img = '/images/a-platform-for-builders.webp';
 
 const Brand = styled.p`
-text-align: center;
-font-size: 4rem;
-font-weight: 600;
+	text-align: center;
+	font-size: 4rem;
+	font-weight: 600;
 `
-
-const BRAND = 'Community'
 
 const Home = () => {
 	const theme: any = useTheme();
@@ -52,7 +51,7 @@ const Home = () => {
 							<br />
 						</Grid>
 						<Grid item md={12} sm={12}>
-							<Image src={img} width={600} height={600} />
+							<Image src={img} width={600} height={600} alt="" />
 						</Grid>
 					</Grid>
 					<Grid container justify="center">
@@ -66,7 +65,7 @@ const Home = () => {
 					<Grid item md={12} sm={12}>
 						<div>
 						<h2>Support</h2>
-							<Link href="/b/test" key="test">
+							<Link href="/b/test" key="test" passHref>
 								<Button
 									color="secondary"
 									variant="contained"

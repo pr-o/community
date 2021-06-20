@@ -53,7 +53,6 @@ const title = css`
 	margin-top: 30px;
 	margin-bottom: 25px;
 	min-height: 32px;
-	font-family: 'Roboto Slab', 'Times New Roman', serif;
 `;
 
 const subTitle = css`
