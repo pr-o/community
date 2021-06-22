@@ -4,9 +4,10 @@ import Link from 'next/link'
 import { Grid, Button } from '@material-ui/core';
 import { ThumbUpAlt } from '@material-ui/icons';
 
-import { useTheme } from '@emotion/react';
+import { css, useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Header from 'components/Header/Header'
+import Footer from 'components/Footer/Footer'
 
 const BRAND = 'Community'
 const img = '/images/a-platform-for-builders.webp';
@@ -21,9 +22,8 @@ const Home = () => {
 	const theme: any = useTheme();
 
 	return (
-		<>
-		<Header />
 		<div css={theme.body}>
+		<Header />
 			<div css={theme.container}>
 				<Grid container justify="center">
 					<Grid item>
@@ -77,12 +77,8 @@ const Home = () => {
 					</Grid>
 				</Grid>
 			</div>
-			{/*
-				// TODO
-				// Footer
-			 */}
+		<Footer />
 		</div>
-		</>
 	);
 }
 
