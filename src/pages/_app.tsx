@@ -70,7 +70,6 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
 					content="Online community for ..."
 				/>
 				<meta name="theme-color" content="#008080" />
-				<link rel="preload" type="text/css" href="styles/globals.css" />
 				<link rel="shortcut icon" href="/favicon.png" />
 				<link rel="apple-touch-icon" sizes="76x76" href="apple-icon" />
 				<title>{` ❤️ `} Community</title>

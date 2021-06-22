@@ -81,7 +81,7 @@ const ErrorPage: FC = () => {
 					{`Page not found :(`}
 				</h2>
 				<h4 css={description}>
-					{`Looks like you got lost.`}
+					{`Looks like you got lost`}
 				</h4>
 			</Center>
 		</PageHeader>

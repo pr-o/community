@@ -206,3 +206,13 @@ export const preFooter = (theme) => css`
 	transition-duration: 0.5s;
 	transition-property: background-color, color;
 `;
+
+export const footer = (theme) => css`
+	color: ${theme.text};
+	background: ${theme.background};
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transition-duration: 0.5s;
+	transition-property: background-color, color;
+`;
