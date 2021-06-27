@@ -1,69 +1,103 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link';
 import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { RootState } from 'lib/redux/modules';
 import { setTheme, Theme } from 'lib/redux/modules/theme';
+import styled from '@emotion/styled';
 
-// import { useRouter } from 'next/router';
-// import HeaderLinks from './HeaderLinks';
-
-import { makeStyles, Theme as MuiTheme, createStyles } from '@material-ui/core/styles';
-import { AppBar, Toolbar, Menu, MenuItem, Button, IconButton, Badge } from '@material-ui/core';
 import {
-	Mail as MailIcon,
-	MoreVert as MoreIcon,
+	ViewDay as ViewDayIcon,
+	ViewCarousel as ViewCarouselIcon,
 	Brightness4 as DarkThemeIcon,
 	Brightness7 as LightThemeIcon,
 	AccountCircle as AccountCircleIcon,
+	Mail as MailIcon,
+	MoreVert as MoreIcon,
 	Notifications as NotificationsIcon,
 } from '@material-ui/icons';
 
+interface Props {
+	fixed?: boolean;
+	color: string;
+	changeColorOnScroll: {
+		height: number;
+		color: string;
+	}
+};
+
+interface HeaderProps {
+	color?: string;
+	paddingTop?: string;
+}
+
 const BRAND = 'Community'
 
-const useStyles = makeStyles((muiTheme: MuiTheme) =>
-  createStyles({
-    grow: {
-      flexGrow: 1,
-    },
-		toolbar: {
-			backgroundColor: '#008080',
-			padding: '0 1rem',
-			[muiTheme.breakpoints.up('sm')]: {
-				padding: '0 5rem',
-      },
-		},
-		button: {
-			borderRadius: '10px',
-		},
-    title: {
-			'&, & a': {
-				display: 'block',
-				color: '#fff',
-				fontSize: '18px',
-				fontWeight: 700,
-				lineHeight: '30px',
-				minWidth: 'unset',
-				letterSpacing: 'unset',
-				whiteSpace: 'nowrap',
-				textTransform: 'none',
-			}
-    },
-    sectionDesktop: {
-      display: 'none',
-      [muiTheme.breakpoints.up('md')]: {
-        display: 'flex',
-      },
-    },
-    sectionMobile: {
-      display: 'flex',
-      [muiTheme.breakpoints.up('md')]: {
-        display: 'none',
-      },
-    },
-  }),
-);
+const StyledHeader = styled.header<HeaderProps>`
+	position: fixed;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	min-height: 3rem;
+	padding: 1.725rem 10rem 1rem;
+	padding-top: ${props => props.paddingTop ? props.paddingTop : '1.725rem'};
+	margin-bottom: 1rem;
+	color: #fff;
+	background-color: ${props => props.color};
+	box-shadow: 0 4px 18px 0px rgba(0, 0, 0, 0.12), 0 7px 10px -5px rgba(0, 0, 0, 0.15);
+	transition: all 250ms ease 0s;
+	z-index: 999;
+`;
+const Brand = styled.div`
+	display: flex;
+	justify-content: flex-start;
+	width: clamp(5rem, 10ch, 10rem);
+	font-size: 1.25rem;
+	font-weight: 100;
+	line-height: 2rem;
+	@media (max-width: 807px) {
+		width: 100%;
+		justify-content: center;
+		margin-top: 1rem;
+	}
+`;
+const RightMenus = styled.div`
+	display: flex;
+	justify-content: flex-end;
+`;
+const Menu = styled.div`
+	display: flex;
+	width: clamp(5rem, 5ch, 10rem);
+	margin: 0 clamp(0.25rem, 0.5rem, 1rem);
+	font-size: .875rem;
+	line-height: 1rem;
+	color: #fff;
 
-export default function PrimarySearchAppBar() {
+`;
+
+const Header = ({ fixed, color, changeColorOnScroll }: Props) => {
+
+	const [headerColor, setHeaderColor] = useState(color);
+	const [paddingTop, setPaddingTop] = useState('2rem');
+
+	useEffect(() => {
+		if (!changeColorOnScroll) return;
+		window.addEventListener('scroll', changeHeaderColor);
+		return () => window.removeEventListener('scroll', changeHeaderColor);
+	}, [])
+
+	const changeHeaderColor = () => {
+		const windowsScrollTop = window.pageYOffset;
+		if (windowsScrollTop > changeColorOnScroll.height) {
+			setHeaderColor(changeColorOnScroll.color)
+			setPaddingTop('1rem')
+		}
+		if (windowsScrollTop <= changeColorOnScroll.height) {
+			setHeaderColor(color)
+			setPaddingTop('1.725rem')
+		}
+	}
 
 	const dispatch = useDispatch();
 
@@ -74,141 +108,37 @@ export default function PrimarySearchAppBar() {
 		shallowEqual
 	);
 
-	const classes = useStyles();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState<null | HTMLElement>(null);
-
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
 	const toggleTheme = () => {
 		theme.theme === Theme.light
 			? dispatch(setTheme(Theme.dark)) && document.body.classList.replace('light', 'dark')
 			: dispatch(setTheme(Theme.light)) && document.body.classList.replace('dark', 'light')
 	}
 
-  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget)
 
-  const handleMobileMenuClose = () => setMobileMoreAnchorEl(null);
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    handleMobileMenuClose();
-  };
-
-  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
-
-  const menuId = 'menu';
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-    </Menu>
-  );
-
-  const mobileMenuId = 'menu-mobile';
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem>
-        <IconButton aria-label="show mails" color="inherit">
-          <Badge badgeContent={3} color="secondary">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton aria-label="show notifications" color="inherit">
-          <Badge badgeContent={7} color="secondary">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircleIcon />
-        </IconButton>
-        <p>Profile</p>
-      </MenuItem>
-    </Menu>
-  );
-
-  return (
-    <div className={classes.grow}>
-      <AppBar position="static">
-        <Toolbar className={classes.toolbar}>
-          <Button className={classes.button}>
-						<Link href="/">
-							<a className={classes.title}>
-								{`${BRAND}`}
-							</a>
-						</Link>
-					</Button>
-          <div className={classes.grow} />
-          <div className={classes.sectionDesktop}>
-            <IconButton aria-label="show mails" color="inherit">
-              <Badge badgeContent={3} color="secondary">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            <IconButton aria-label="show notifications" color="inherit">
-              <Badge badgeContent={7} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-						<IconButton onClick={toggleTheme} aria-label="Toggle theme" color="inherit">
-							{theme.theme === 'light' ? <LightThemeIcon /> : <DarkThemeIcon />}
-						</IconButton>
-            <IconButton
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircleIcon />
-            </IconButton>
-          </div>
-          <div className={classes.sectionMobile}>
-            <IconButton
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
-          </div>
-        </Toolbar>
-      </AppBar>
-      { renderMobileMenu }
-      { renderMenu }
-    </div>
-  );
+	return (
+		<StyledHeader color={headerColor} paddingTop={paddingTop}>
+			<Brand>
+				<Link href="/" >
+					Community
+				</Link>
+			</Brand>
+			<RightMenus>
+				<Menu>
+					<ViewDayIcon />
+					A
+				</Menu>
+				<Menu>
+					<ViewCarouselIcon />
+					B
+				</Menu>
+				<Menu onClick={() => toggleTheme()}>
+					{theme.theme === 'light' ? <LightThemeIcon /> : <DarkThemeIcon />}
+				</Menu>
+				<Menu>
+					<AccountCircleIcon />
+				</Menu>
+			</RightMenus>
+		</StyledHeader>
+	)
 }
+export default Header;
