@@ -16,10 +16,10 @@ const PageHeader = styled.div`
 	background-image: url(${image});
 	background-size: cover;
 	background-position: top center;
-	&:before {
+	&::before {
 		background: rgba(0, 0, 0, 0.5);
 	}
-	&:before, &:after {
+	&::before, &::after {
 		position: absolute;
 		z-index: 1;
 		width: 100%;

@@ -1,22 +1,20 @@
-import React from 'react';
+import React, { FC } from 'react';
 import Link from 'next/link';
 import styled from '@emotion/styled';
+import { css } from '@emotion/react';
+import { COLORS } from 'constants/university'
 
-const Container = styled.div`
+interface AnchorProps {
+	color: string;
+}
+
+const StyledFooter = styled.footer`
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
 	align-items: center;
 	padding: 1rem 2rem;
-`;
-const Center = styled.div`
-	display: flex;
-	@media (max-width: 807px) {
-		width: 100%;
-		justify-content: center;
-		margin-top: 1rem;
-	}
-`;
+`
 const Brand = styled.div`
 	display: flex;
 	justify-content: flex-start;
@@ -24,6 +22,15 @@ const Brand = styled.div`
 	font-size: 1.25rem;
 	font-weight: 100;
 	line-height: 2rem;
+	@media (max-width: 807px) {
+		width: 100%;
+		justify-content: center;
+		margin-top: 1rem;
+	}
+`;
+
+const Center = styled.div`
+	display: flex;
 	@media (max-width: 807px) {
 		width: 100%;
 		justify-content: center;
@@ -72,6 +79,9 @@ const Copyright = styled.div`
 		margin-top: 1rem;
 	}
 `;
+const Anchor = styled.a<AnchorProps>`
+	color: ${props => props.color};
+`
 
 const Item = styled.div`
 	display: flex;
@@ -81,57 +91,57 @@ const Item = styled.div`
 	line-height: 1rem;
 `;
 
-const Footer = (props: any) => {
-
+const Footer: FC = () => {
 	return (
-		<footer>
-			<Container>
-				<Brand>
-					<Link href="/" passHref>
-						Community
-					</Link>
-				</Brand>
-				<Center>
-					<Item>
-						<a
-							href="https://www.usc.edu"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							USC
-						</a>
-					</Item>
-					<Item>
-						<a
-							href="https://www.ucla.edu"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							UCLA
-						</a>
-					</Item>
-					<Item>
-						<a
-							href="https://www.caltech.edu"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							Caltech
-						</a>
-					</Item>
-				</Center>
-				<Copyright>
-					&copy; {new Date().getFullYear()}. made with ❤️ by
-					<a
-						// href="https://www.sunghah.com"
+		<StyledFooter>
+			<Brand>
+				<Link href="/" passHref>
+					Community
+				</Link>
+			</Brand>
+			<Center>
+				<Item>
+					<Anchor
+						href="https://www.usc.edu"
 						target="_blank"
 						rel="noopener noreferrer"
+						color={COLORS['USC'].primary}
 					>
-						{'Sung'}
-					</a>
-				</Copyright>
-			</Container>
-		</footer>
+						USC
+					</Anchor>
+				</Item>
+				<Item>
+					<Anchor
+						href="https://www.ucla.edu"
+						target="_blank"
+						rel="noopener noreferrer"
+						color={COLORS['UCLA'].primary}
+					>
+						UCLA
+					</Anchor>
+				</Item>
+				<Item>
+					<Anchor
+						href="https://www.caltech.edu"
+						target="_blank"
+						rel="noopener noreferrer"
+						color={COLORS['CalTech'].primary}
+					>
+						CalTech
+					</Anchor>
+				</Item>
+			</Center>
+			<Copyright>
+				&copy; {`${new Date().getFullYear()}. made with  ❤️  by`}
+				<a
+					// href="https://www.sunghah.com"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					{'Sung'}
+				</a>
+			</Copyright>
+		</StyledFooter>
 	);
 };
 

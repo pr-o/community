@@ -2,6 +2,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import styled from '@emotion/styled';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
+interface Props { path: string }
+
 const image = '/images/a-thousand-paths-365kb.jpg';
 
 const Wrapper = styled.div`
@@ -13,7 +15,7 @@ const Wrapper = styled.div`
 	justify-content: center;
 	align-items: center;
 	overflow: hidden;
-	&:after {
+	&::after {
 		top: 0;
 		left: 0;
 		position: fixed;
@@ -24,7 +26,7 @@ const Wrapper = styled.div`
 		background-image: url(${image});
 		background-size: cover;
 	}
-	&:before {
+	&::before {
 		top: 0;
 		left: 0;
 		position: absolute;
@@ -51,18 +53,17 @@ const Center = styled.div`
 
 const Title = styled.p`
 	color: #008080;
-	font-size: 1.5rem;
+	font-size: 1.375rem;
 	font-weight: 600;
 	margin-top: 30px;
 	min-height: 30px;
-	font-family: 'Roboto Slab', 'Times New Roman', serif;
 `;
 
 const useStyles = makeStyles({
 	progress: {
 		color: '#008080',
-		width: '9rem !important',
-		height: '9rem !important',
+		width: '8rem !important',
+		height: '8rem !important',
 	},
 });
 
@@ -77,8 +78,6 @@ const truncatePath = (dest: string) => {
 	});
 	return dest;
 };
-
-interface Props { path: string }
 
 const RouteChange: React.FC<Props> = ({ path }) => {
 	const classes = useStyles();

@@ -36,20 +36,19 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
 		shallowEqual
 	);
 
-  const createComment = () => {
-    const comment = document.createComment(`
+	const createComment = () => {
+		const comment = document.createComment(`
       =========================================================
       * Unnamed (yet) community
       =========================================================
-
-			* Coded by Sung (https://www.sunghah.com)
-      * Copyright ${new Date().getFullYear()}
+			* Coded by Sung
+			* Copyright ${new Date().getFullYear()}
 
       =========================================================
       `);
 
 		document.insertBefore(comment, document.documentElement);
-  }
+	}
 
 	React.useEffect(() => {
 		createComment()
