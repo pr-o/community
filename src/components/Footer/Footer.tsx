@@ -52,7 +52,7 @@ const Copyright = styled.div`
 		font-style: italic;
 		font-weight: 900;
 		color: #008080;
-		margin-left: 0.375rem;
+		margin-left: .25rem;
 		padding: .25rem .25rem;
 		line-height: 1.25rem;
 		z-index: 0;
@@ -132,7 +132,7 @@ const Footer: FC = () => {
 				</Item>
 			</Center>
 			<Copyright>
-				&copy; {`${new Date().getFullYear()}. made with  ❤️  by`}
+				&copy; {`${new Date().getFullYear()}. made by`}
 				<a
 					// href="https://www.sunghah.com"
 					target="_blank"
