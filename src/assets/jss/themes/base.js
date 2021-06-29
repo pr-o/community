@@ -131,6 +131,7 @@ export const hexToRgb = (input) => {
 export const body = (theme) => css`
 	color: ${theme.text};
 	background: ${theme.bodyBackground};
+	width: 100%;
 	transition-duration: 1s;
 	transition-property: background-color, color;
 `;
@@ -197,7 +198,7 @@ export const preFooter = (theme) => css`
 	color: ${theme.text};
 	background: ${theme.background};
 	text-align: center;
-	padding: 50px 0px;
+	padding: 100px 0px;
 	margin: 50px 0;
 	h2 {
 		font-weight: 500;
