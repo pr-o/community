@@ -13,6 +13,7 @@ const StyledFooter = styled.footer`
 	flex-wrap: wrap;
 	justify-content: space-between;
 	align-items: center;
+	margin-top: auto;
 	padding: 1rem 2rem;
 `
 const Brand = styled.div`

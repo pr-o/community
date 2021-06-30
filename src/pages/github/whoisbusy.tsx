@@ -11,6 +11,15 @@ interface CaptionRankingProps {
 	place: number;
 }
 
+interface IObject {
+	[key: string]: string | number;
+}
+interface IData {
+	login: string;
+	avatarUrl: string;
+	count: number;
+}
+
 const repos: Array<string | undefined> = [
 	process.env.GITHUB_LEMONADE_REPO_1,
 	process.env.GITHUB_LEMONADE_REPO_2,
@@ -24,7 +33,8 @@ const img = '/images/a-platform-for-builders.webp';
 
 const Container = styled.div`
 	display: flex;
-	padding: 10rem 10rem 15rem;
+	padding: 10rem 5rem 10rem 10rem;
+	min-height: 100%;
 	flex-direction: column;
 	justify-content: center;
 	align-items: space-around;
@@ -57,7 +67,6 @@ const TopReviewers = styled.div`
 	justify-content: flex-start;
 	width: clamp(20rem, 20rem, 30%);
 `;
-
 const TopRequesters = styled.div`
 	display: flex;
 	flex-direction: column;
@@ -65,7 +74,6 @@ const TopRequesters = styled.div`
 	justify-content: flex-start;
 	width: clamp(20rem, 20rem, 30%);
 `;
-
 const Row = styled.div`
 	display: flex;
 	flex-direction: column;
@@ -79,12 +87,10 @@ const Card = styled.div`
 	justify-content: flex-start;
 	align-items: center;
 `;
-
 const Captions = styled.div`
 	flex-direction: column;
 	margin-left: 1rem;
 `;
-
 const StyledImage = styled(Image)`
 	display: flex;
 	border-radius: 50%;
@@ -139,16 +145,15 @@ export async function getServerSideProps() {
 
 	const response = await Promise.all(calls);
 	const data = response
-		.filter((resp) => resp.data.length > 0)
-		.map((resp) => resp.data.length > 0 && resp.data);
+		?.filter((resp: any) => resp.data.length > 0)
+		.map((resp: any) => resp.data.length > 0 && resp.data);
 
-	const truncateURLs = (data) => {
-		const regex =
-			/(\"https?:\/\/(api.)?github.com\/(repos\/)?fastlanguage\/fastlanguage-)(.*?)(\/.+?\")/g;
-		return JSON.parse(JSON.stringify(data).replace(regex, '"__$4__"'));
-	};
+	const regex =
+		/(\"https?:\/\/(api.)?github.com\/(repos\/)?fastlanguage\/fastlanguage-)(.*?)(\/.+?\")/g;
 
-	let newData = await truncateURLs(data);
+	const truncateURLs = (data: object) => JSON.parse(JSON.stringify(data).replace(regex, '"__$4__"'));
+
+	const newData = await truncateURLs(data);
 
 	return {
 		props: {
@@ -160,65 +165,59 @@ export async function getServerSideProps() {
 const getOrdinalSuffix = (n: number) =>
 	['st', 'nd', 'rd'][((((n + 90) % 100) - 10) % 10) - 1] || 'th';
 
+const sortObject = (obj: IObject) => Object.entries(obj)
+	.sort((a: any, b: any) => b[1].count - a[1].count)
+	.map((entry) => entry[1]);
+
+
 const WhoIsBusy = ({ data }: any) => {
-	const [requesters, setRequesters] = useState();
-	const [reviewers, setReviewers] = useState([]);
+	const [requesters, setRequesters] = useState<Array<IData | unknown>>([]);
+	const [reviewers, setReviewers] = useState<Array<IData | unknown>>([]);
 	const theme: any = useTheme();
 
 	useEffect(() => {
-		setReviewers(reviewers);
-		setRequesters(requesters);
-	}, [requesters, reviewers]);
+		reduceReviewers(data);
+	}, [data]);
 
-	useEffect(() => {
-		const ff = reduceReviewers(data);
-		console.log(ff);
-	}, []);
+	const reduceReviewers = (data: any) => {
+		const aggregated: any = [].concat.apply([], data);
 
-	const reduceReviewers = (data) => {
-		const aggregated = [].concat.apply([], data);
+		const revsByRepo = aggregated.map((agg: any) => agg.requested_reviewers);
+		const reqsByRepo = aggregated.map((agg: any) => agg.user);
 
-		const revs = aggregated.map((agg) => agg.requested_reviewers);
-		const reqs = aggregated.map((agg) => agg.user);
+		const revs = [].concat.apply([], revsByRepo);
+		const reqs = [].concat.apply([], reqsByRepo);
 
-		const rev = [].concat.apply([], revs);
-		const req = [].concat.apply([], reqs);
+		let reviewersObject: any = {};
+		let requestersObject: any = {};
 
-		let reviewersObject = {};
-		let requestersObject = {};
-
-		rev.forEach((r) => {
+		revs.forEach(({ login, avatar_url }) => {
 			reviewersObject = {
 				...reviewersObject,
-				[r.login]: {
-					login: r.login,
-					avatarUrl: r.avatar_url,
-					count: reviewersObject[r.login]?.count ? reviewersObject[r.login].count + 1 : 1,
+				[login]: {
+					login,
+					avatarUrl: avatar_url,
+					count: reviewersObject[login]?.count ? reviewersObject[login].count + 1 : 1,
 				},
 			};
 		});
 
-		req.forEach((r) => {
+		reqs.forEach(({ login, avatar_url }) => {
 			requestersObject = {
 				...requestersObject,
-				[r.login]: {
-					login: r.login,
-					avatarUrl: r.avatar_url,
-					count: reviewersObject[r.login]?.count ? reviewersObject[r.login].count + 1 : 1,
+				[login]: {
+					login: login,
+					avatarUrl: avatar_url,
+					count: requestersObject[login]?.count ? requestersObject[login].count + 1 : 1,
 				},
 			};
 		});
 
-		const sortedRev = Object.entries(reviewersObject)
-			.sort((a, b) => b[1].count - a[1].count)
-			.map((entry) => entry[1]);
-		const sortedReq = Object.entries(requestersObject)
-			.sort((a, b) => b[1].count - a[1].count)
-			.map((entry) => entry[1]);
+		const sortedRevs = sortObject(reviewersObject)
+		const sortedReqs = sortObject(requestersObject)
 
-		setReviewers(sortedRev);
-		setRequesters(sortedReq);
-		return;
+		setReviewers(sortedRevs);
+		setRequesters(sortedReqs);
 	};
 
 	return (
@@ -234,7 +233,7 @@ const WhoIsBusy = ({ data }: any) => {
 				<LeaderBoards>
 					<TopReviewers>
 						<Title>Reviewers</Title>
-						{reviewers?.map((rev, index) => (
+						{reviewers?.map((rev: any, index) => (
 							<Row key={`${index}-${rev}`}>
 								<CaptionRanking place={index}>
 									{`${index + 1}${getOrdinalSuffix(index + 1)}`}
@@ -268,7 +267,7 @@ const WhoIsBusy = ({ data }: any) => {
 					</ImageWrapper>
 					<TopRequesters>
 						<Title>Requesters</Title>
-						{requesters?.map((rev, index) => (
+						{requesters?.map((rev: any, index) => (
 							<Row key={`${index}-${rev}`}>
 								<CaptionRanking place={index}>
 									{`${index + 1}${getOrdinalSuffix(index + 1)}`}

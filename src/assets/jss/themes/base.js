@@ -131,7 +131,7 @@ export const hexToRgb = (input) => {
 export const body = (theme) => css`
 	color: ${theme.text};
 	background: ${theme.bodyBackground};
-	width: 100%;
+	height: 100%;
 	transition-duration: 1s;
 	transition-property: background-color, color;
 `;
