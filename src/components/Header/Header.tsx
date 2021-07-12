@@ -6,6 +6,8 @@ import { setTheme, Theme } from 'lib/redux/modules/theme';
 import styled from '@emotion/styled';
 
 import {
+	Menu as MenuIcon,
+	GitHub as GitHubIcon,
 	ViewDay as ViewDayIcon,
 	ViewCarousel as ViewCarouselIcon,
 	Brightness4 as DarkThemeIcon,
@@ -40,18 +42,27 @@ const StyledHeader = styled.header<HeaderProps>`
 	align-items: center;
 	width: 100%;
 	min-height: 3rem;
-	padding: ${props => props.padding ? props.padding : '.75rem'} 10rem;
+	padding: .75rem clamp(1rem, 2%, 10rem);
+	padding-top: ${props => props.padding ? props.padding : '.75rem'};
+	padding-bottom: ${props => props.padding ? props.padding : '.75rem'};
+
 	margin-bottom: 1rem;
 	color: #fff;
 	background-color: ${props => props.color};
 	box-shadow: 0 4px 18px 0px rgba(0, 0, 0, 0.12), 0 7px 10px -5px rgba(0, 0, 0, 0.15);
 	transition: all 300ms ease 0s;
 	z-index: 999;
+	& nav > ul {
+		list-style: none;
+		& > li {
+			display: inline-block;
+		}
+	}
 `;
 const Brand = styled.div`
 	display: flex;
-	justify-content: flex-start;
-	width: clamp(5rem, 10ch, 10rem);
+	/* justify-content: flex-start; */
+	width: clamp(5rem, 12ch, 10rem);
 	font-size: 1.25rem;
 	font-weight: 100;
 	line-height: 2rem;
@@ -61,18 +72,32 @@ const Brand = styled.div`
 		margin-top: 1rem;
 	}
 `;
-const RightMenus = styled.div`
+const Left = styled.div`
+	display: flex;
+	justify-content: center;
+`;
+const Center = styled.div`
 	display: flex;
 	justify-content: flex-end;
 `;
+const Right = styled.div`
+	display: flex;
+	justify-content: flex-end;
+`;
+
+const HamburgerMenu = styled.div`
+	display: flex;
+	align-items: center;
+`
 const Menu = styled.div`
 	display: flex;
-	width: clamp(5rem, 5ch, 10rem);
-	margin: 0 clamp(0.25rem, 0.5rem, 1rem);
+	align-items: center;
+	cursor: pointer;
+	/* width: clamp(1rem, 5ch, 10rem); */
+	margin: 0 .5rem;
 	font-size: .875rem;
 	line-height: 1rem;
 	color: #fff;
-
 `;
 
 const Header = ({ fixed, color, changeColorOnScroll }: Props) => {
@@ -116,27 +141,57 @@ const Header = ({ fixed, color, changeColorOnScroll }: Props) => {
 
 	return (
 		<StyledHeader color={headerColor} padding={padding}>
-			<Brand>
-				<Link href="/" >
-					Community
-				</Link>
-			</Brand>
-			<RightMenus>
-				<Menu>
-					<ViewDayIcon />
-					A
-				</Menu>
-				<Menu>
-					<ViewCarouselIcon />
-					B
-				</Menu>
-				<Menu onClick={() => toggleTheme()}>
-					{theme.theme === 'light' ? <LightThemeIcon /> : <DarkThemeIcon />}
-				</Menu>
-				<Menu>
-					<AccountCircleIcon />
-				</Menu>
-			</RightMenus>
+			<Left>
+				<HamburgerMenu>
+					<MenuIcon />
+				</HamburgerMenu>
+				<Brand>
+					<Link href="/" >
+						Community
+					</Link>
+				</Brand>
+			</Left>
+			<Center>
+				{/*
+					TODO: SearchBox
+				*/}
+			</Center>
+			<Right>
+				<nav>
+					<ul>
+						<li>
+							<Menu>
+								<ViewDayIcon />
+								AAA
+							</Menu>
+						</li>
+						<li>
+							<Menu>
+								<ViewCarouselIcon />
+								BBB
+							</Menu>
+						</li>
+						<li>
+							<Menu onClick={() => toggleTheme()}>
+								<Link href="/github/whoisbusy" passHref>
+									<a><GitHubIcon /></a>
+								</Link>
+							</Menu>
+						</li>
+						<li>
+							<Menu onClick={() => toggleTheme()}>
+								{theme.theme === 'light' ? <LightThemeIcon /> : <DarkThemeIcon />}
+							</Menu>
+						</li>
+						<li>
+							<Menu>
+								<AccountCircleIcon />
+							</Menu>
+						</li>
+					</ul>
+				</nav>
+			</Right>
+
 		</StyledHeader>
 	)
 }
