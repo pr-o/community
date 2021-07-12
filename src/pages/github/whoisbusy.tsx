@@ -132,6 +132,27 @@ const CaptionCount = styled.h3`
 		color: #666;
 	}
 `;
+const CaptionTooltip = styled.div`
+   position: relative;
+   &::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      display: block;
+      border-radius: 6px;
+      padding: 1em;
+      top: 100%;
+      left: 0;
+      font-size: .75rem;
+      color: #fff;
+      background-color: #444;
+      white-space: pre;
+      transform: scale(0);
+   }
+   &:hover::after {
+      transform: scale(1);
+      transition: transform ease-out 150ms;
+   }
+`
 
 export async function getServerSideProps() {
 	const octokit = new Octokit({ auth: process.env.GITHUB_PERSONAL_AUTH_TOKEN });
@@ -151,7 +172,7 @@ export async function getServerSideProps() {
 	const regex =
 		/(\"https?:\/\/(api.)?github.com\/(repos\/)?fastlanguage\/fastlanguage-)(.*?)(\/.+?\")/g;
 
-	const truncateURLs = (data: object) => JSON.parse(JSON.stringify(data).replace(regex, '"__$4__"'));
+	const truncateURLs = (data: object) => JSON.parse(JSON.stringify(data).replace(regex, '"$4"'));
 
 	const newData = await truncateURLs(data);
 
@@ -180,35 +201,43 @@ const WhoIsBusy = ({ data }: any) => {
 	}, [data]);
 
 	const reduceReviewers = (data: any) => {
-		const aggregated: any = [].concat.apply([], data);
+		const dataConcat: any[] = [].concat(...data);
 
-		const revsByRepo = aggregated.map((agg: any) => agg.requested_reviewers);
-		const reqsByRepo = aggregated.map((agg: any) => agg.user);
+		let revs: any[] = [];
+		let reqs: any[] = [];
 
-		const revs = [].concat.apply([], revsByRepo);
-		const reqs = [].concat.apply([], reqsByRepo);
+		dataConcat.forEach((pr: any) => {
+			reqs = [...reqs, Object.assign(pr.user, { repo: pr.url })]
+			if (Object.keys(pr.requested_reviewers).length) {
+				pr.requested_reviewers.map((reviewer: any) => {
+					revs = [...revs, Object.assign(reviewer, { repo: pr.url })]
+				})
+			}
+		})
 
 		let reviewersObject: any = {};
 		let requestersObject: any = {};
 
-		revs.forEach(({ login, avatar_url }) => {
+		revs.forEach(({ login, avatar_url, repo }) => {
 			reviewersObject = {
 				...reviewersObject,
 				[login]: {
 					login,
 					avatarUrl: avatar_url,
 					count: reviewersObject[login]?.count ? reviewersObject[login].count + 1 : 1,
+					repo: reviewersObject[login]?.repo.length ? [...new Set([...reviewersObject[login].repo, repo])] : [repo],
 				},
 			};
 		});
 
-		reqs.forEach(({ login, avatar_url }) => {
+		reqs.forEach(({ login, avatar_url, repo }) => {
 			requestersObject = {
 				...requestersObject,
 				[login]: {
 					login: login,
 					avatarUrl: avatar_url,
 					count: requestersObject[login]?.count ? requestersObject[login].count + 1 : 1,
+					repo: requestersObject[login]?.repo.length ? [...new Set([...requestersObject[login].repo, repo])] : [repo],
 				},
 			};
 		});
@@ -234,7 +263,7 @@ const WhoIsBusy = ({ data }: any) => {
 					<TopReviewers>
 						<Title>Reviewers</Title>
 						{reviewers?.map((rev: any, index) => (
-							<Row key={`${index}-${rev}`}>
+							<Row key={`${rev}-${index}`}>
 								<CaptionRanking place={index}>
 									{`${index + 1}${getOrdinalSuffix(index + 1)}`}
 								</CaptionRanking>
@@ -248,10 +277,12 @@ const WhoIsBusy = ({ data }: any) => {
 									/>
 									<Captions>
 										<CaptionLogin>{`${rev.login}`}</CaptionLogin>
-										<CaptionCount>
-											<span>{`${rev.count} `}</span>
-											{`${rev.count > 1 ? 'reviews' : 'review'} pending`}
-										</CaptionCount>
+										<CaptionTooltip data-tooltip={`${rev.repo.join('\n')}`}>
+											<CaptionCount>
+												<span>{`${rev.count} `}</span>
+												{`${rev.count > 1 ? 'reviews' : 'review'} pending`}
+											</CaptionCount>
+										</CaptionTooltip>
 									</Captions>
 								</Card>
 							</Row>
@@ -267,25 +298,27 @@ const WhoIsBusy = ({ data }: any) => {
 					</ImageWrapper>
 					<TopRequesters>
 						<Title>Requesters</Title>
-						{requesters?.map((rev: any, index) => (
-							<Row key={`${index}-${rev}`}>
+						{requesters?.map((req: any, index) => (
+							<Row key={`${req}-${index}`}>
 								<CaptionRanking place={index}>
 									{`${index + 1}${getOrdinalSuffix(index + 1)}`}
 								</CaptionRanking>
 
 								<Card>
 									<StyledImage
-										src={rev.avatarUrl}
-										alt={`${rev.login}'s avatar`}
+										src={req.avatarUrl}
+										alt={`${req.login}'s avatar`}
 										width={'64px'}
 										height={'64px'}
 									/>
 									<Captions>
-										<CaptionLogin>{`${rev.login}`}</CaptionLogin>
-										<CaptionCount>
-											<span>{`${rev.count} `}</span>
-											{`${rev.count > 1 ? 'requests' : 'request'} pending`}
-										</CaptionCount>
+										<CaptionLogin>{`${req.login}`}</CaptionLogin>
+										<CaptionTooltip data-tooltip={`${req.repo.join('\n')}`}>
+											<CaptionCount>
+												<span>{`${req.count} `}</span>
+												{`${req.count > 1 ? 'requests' : 'request'} pending`}
+											</CaptionCount>
+										</CaptionTooltip>
 									</Captions>
 								</Card>
 							</Row>
