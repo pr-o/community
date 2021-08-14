@@ -36,16 +36,13 @@ const BRAND = 'Community'
 
 const StyledHeader = styled.header<HeaderProps>`
 	position: fixed;
-	display: flex;
-	flex-flow: row nowrap;
-	justify-content: space-between;
-	align-items: center;
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
 	width: 100%;
 	min-height: 3rem;
-	padding: .75rem clamp(1rem, 2%, 10rem);
+	padding: .75rem clamp(1rem, 4%, 10rem);
 	padding-top: ${props => props.padding ? props.padding : '.75rem'};
 	padding-bottom: ${props => props.padding ? props.padding : '.75rem'};
-
 	margin-bottom: 1rem;
 	color: #fff;
 	background-color: ${props => props.color};
@@ -59,41 +56,48 @@ const StyledHeader = styled.header<HeaderProps>`
 		}
 	}
 `;
+
+const Left = styled.div`
+	display: grid;
+	grid-column: 1 / 3;
+	justify-content: start;
+
+`;
+const Center = styled.div`
+	display: grid;	
+	grid-column: 3 / 4;
+`;
+const Right = styled.div`
+	display: grid;
+	grid-column: 4 / 6;
+	justify-content: end;
+`;
 const Brand = styled.div`
-	display: flex;
-	/* justify-content: flex-start; */
-	width: clamp(5rem, 12ch, 10rem);
 	font-size: 1.25rem;
 	font-weight: 100;
 	line-height: 2rem;
 	@media (max-width: 807px) {
-		width: 100%;
-		justify-content: center;
-		margin-top: 1rem;
+		display: none;
 	}
 `;
-const Left = styled.div`
-	display: flex;
-	justify-content: center;
-`;
-const Center = styled.div`
-	display: flex;
-	justify-content: flex-end;
-`;
-const Right = styled.div`
-	display: flex;
-	justify-content: flex-end;
-`;
-
 const HamburgerMenu = styled.div`
-	display: flex;
+	display: none;
 	align-items: center;
+	line-height: 2rem;
+	@media (max-width: 807px) {
+		display: flex;
+	}
+`
+const Menus = styled.div`
+	display: flex;
+	@media (max-width: 807px) {
+		display: none;
+	}
 `
 const Menu = styled.div`
 	display: flex;
 	align-items: center;
 	cursor: pointer;
-	/* width: clamp(1rem, 5ch, 10rem); */
 	margin: 0 .5rem;
 	font-size: .875rem;
 	line-height: 1rem;
@@ -142,14 +146,14 @@ const Header = ({ fixed, color, changeColorOnScroll }: Props) => {
 	return (
 		<StyledHeader color={headerColor} padding={padding}>
 			<Left>
+				<Brand>
+					<Link href="/" >
+						{BRAND}
+					</Link>
+				</Brand>
 				<HamburgerMenu>
 					<MenuIcon />
 				</HamburgerMenu>
-				<Brand>
-					<Link href="/" >
-						Community
-					</Link>
-				</Brand>
 			</Left>
 			<Center>
 				{/*
@@ -157,6 +161,7 @@ const Header = ({ fixed, color, changeColorOnScroll }: Props) => {
 				*/}
 			</Center>
 			<Right>
+				<Menus>
 				<nav>
 					<ul>
 						<li>
@@ -190,8 +195,8 @@ const Header = ({ fixed, color, changeColorOnScroll }: Props) => {
 						</li>
 					</ul>
 				</nav>
+				</Menus>
 			</Right>
-
 		</StyledHeader>
 	)
 }
