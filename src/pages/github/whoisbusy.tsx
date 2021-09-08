@@ -27,6 +27,10 @@ const repos: Array<string | undefined> = [
 	process.env.GITHUB_LEMONADE_REPO_4,
 	process.env.GITHUB_LEMONADE_REPO_5,
 	process.env.GITHUB_LEMONADE_REPO_6,
+	process.env.GITHUB_LEMONADE_REPO_7,
+	process.env.GITHUB_LEMONADE_REPO_8,
+	process.env.GITHUB_LEMONADE_REPO_9,
+	process.env.GITHUB_LEMONADE_REPO_10,
 ];
 
 const img = '/images/a-platform-for-builders.webp';
@@ -169,18 +173,14 @@ export async function getServerSideProps() {
 		?.filter((resp: any) => resp.data.length > 0)
 		.map((resp: any) => resp.data.length > 0 && resp.data);
 
-	const regex =
-		/(\"https?:\/\/(api.)?github.com\/(repos\/)?fastlanguage\/fastlanguage-)(.*?)(\/.+?\")/g;
+	// const regex =
+	// 	/(\"https?:\/\/(api.)?github.com\/(repos\/)?fastlanguage\/fastlanguage-)(.*?)(\/.+?\")/g;
 
-	const truncateURLs = (data: object) => JSON.parse(JSON.stringify(data).replace(regex, '"$4"'));
+	// const truncateURLs = (data: object) => JSON.parse(JSON.stringify(data).replace(regex, '"$4"'));
 
-	const newData = await truncateURLs(data);
+	// const newData = await truncateURLs(data);
 
-	return {
-		props: {
-			data: newData,
-		},
-	};
+	return { props: { data } };
 }
 
 const getOrdinalSuffix = (n: number) =>
