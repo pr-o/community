@@ -136,6 +136,9 @@ const Footer: FC = () => {
 				&copy; {`${new Date().getFullYear()}. made by`}
 				<a
 					// href="https://www.sunghah.com"
+
+
+
 					target="_blank"
 					rel="noopener noreferrer"
 				>
