@@ -139,23 +139,48 @@ const CaptionCount = styled.h3`
 const CaptionTooltip = styled.div`
    position: relative;
    &::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      display: block;
-      border-radius: 6px;
-      padding: 1em;
-      top: 100%;
-      left: 0;
-      font-size: .75rem;
-      color: #fff;
-      background-color: #444;
-      white-space: pre;
-      transform: scale(0);
+		content: attr(data-tooltip);
+		position: absolute;
+		display: block;
+		border-radius: 6px;
+		padding: 1em;
+		top: 100%;
+		left: 0;
+		font-size: .75rem;
+		color: #fff;
+		background-color: #444;
+		white-space: pre;
+		transform: scale(0);
    }
    &:hover::after {
-      transform: scale(1);
-      transition: transform ease-out 150ms;
+		transform: scale(1);
+		transition: transform ease-out 150ms;
    }
+`
+
+const NewCaptionTooltip = styled.div`
+	position: relative;
+	& > div {
+		visibility: hidden;
+		position: absolute;
+		display: block;
+		border-radius: 6px;
+		padding: 1em;
+		width: max-content;
+		top: 100%;
+		left: 0;
+		font-size: .75rem;
+		white-space: pre;
+		color: #fff;
+		z-index: 999;
+		background-color: #444;
+	}
+	&:hover > div {
+		visibility: visible;
+	}
+	&:hover > div > span a:hover {
+		color: #008080;
+	}
 `
 
 export async function getServerSideProps() {
@@ -198,6 +223,7 @@ const WhoIsBusy = ({ data }: any) => {
 
 	useEffect(() => {
 		reduceReviewers(data);
+
 	}, [data]);
 
 	const reduceReviewers = (data: any) => {
@@ -207,10 +233,10 @@ const WhoIsBusy = ({ data }: any) => {
 		let reqs: any[] = [];
 
 		dataConcat.forEach((pr: any) => {
-			reqs = [...reqs, Object.assign(pr.user, { repo: pr.url })]
+			reqs = [...reqs, Object.assign(pr.user, { repo: pr.html_url })]
 			if (Object.keys(pr.requested_reviewers).length) {
 				pr.requested_reviewers.map((reviewer: any) => {
-					revs = [...revs, Object.assign(reviewer, { repo: pr.url })]
+					revs = [...revs, Object.assign(reviewer, { repo: pr.html_url })]
 				})
 			}
 		})
@@ -277,12 +303,25 @@ const WhoIsBusy = ({ data }: any) => {
 									/>
 									<Captions>
 										<CaptionLogin>{`${rev.login}`}</CaptionLogin>
-										<CaptionTooltip data-tooltip={`${rev.repo.join('\n')}`}>
+
+										<NewCaptionTooltip>
 											<CaptionCount>
 												<span>{`${rev.count} `}</span>
 												{`${rev.count > 1 ? 'reviews' : 'review'} pending`}
 											</CaptionCount>
-										</CaptionTooltip>
+											<div>
+												<span>
+													{
+														rev.repo.map((r: string, i: number) => (
+															<a key={`${i}${r}`} href={r} target="_blank" rel="noopener noreferrer">
+																{`${r}\n`}
+															</a>
+														)
+														)
+													}
+												</span>
+											</div>
+										</NewCaptionTooltip>
 									</Captions>
 								</Card>
 							</Row>
@@ -327,7 +366,7 @@ const WhoIsBusy = ({ data }: any) => {
 				</LeaderBoards>
 			</Container>
 			<Footer />
-		</div>
+		</div >
 	);
 };
 
