@@ -137,28 +137,6 @@ const CaptionCount = styled.h3`
 	}
 `;
 const CaptionTooltip = styled.div`
-   position: relative;
-   &::after {
-		content: attr(data-tooltip);
-		position: absolute;
-		display: block;
-		border-radius: 6px;
-		padding: 1em;
-		top: 100%;
-		left: 0;
-		font-size: .75rem;
-		color: #fff;
-		background-color: #444;
-		white-space: pre;
-		transform: scale(0);
-   }
-   &:hover::after {
-		transform: scale(1);
-		transition: transform ease-out 150ms;
-   }
-`
-
-const NewCaptionTooltip = styled.div`
 	position: relative;
 	& > div {
 		visibility: hidden;
@@ -304,7 +282,7 @@ const WhoIsBusy = ({ data }: any) => {
 									<Captions>
 										<CaptionLogin>{`${rev.login}`}</CaptionLogin>
 
-										<NewCaptionTooltip>
+										<CaptionTooltip>
 											<CaptionCount>
 												<span>{`${rev.count} `}</span>
 												{`${rev.count > 1 ? 'reviews' : 'review'} pending`}
@@ -321,7 +299,7 @@ const WhoIsBusy = ({ data }: any) => {
 													}
 												</span>
 											</div>
-										</NewCaptionTooltip>
+										</CaptionTooltip>
 									</Captions>
 								</Card>
 							</Row>
