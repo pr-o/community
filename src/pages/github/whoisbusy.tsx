@@ -210,8 +210,6 @@ const WhoIsBusy = ({ data }: any) => {
 		let revs: any[] = [];
 		let reqs: any[] = [];
 
-		console.log('data =>', dataConcat)
-
 		dataConcat.forEach((pr: any) => {
 			reqs = [...reqs, Object.assign(pr.user, { repo: pr.html_url })]
 			if (Object.keys(pr.requested_reviewers).length) {
