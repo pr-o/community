@@ -281,7 +281,6 @@ const WhoIsBusy = ({ data }: any) => {
 									/>
 									<Captions>
 										<CaptionLogin>{`${rev.login}`}</CaptionLogin>
-
 										<CaptionTooltip>
 											<CaptionCount>
 												<span>{`${rev.count} `}</span>
@@ -335,6 +334,18 @@ const WhoIsBusy = ({ data }: any) => {
 												<span>{`${req.count} `}</span>
 												{`${req.count > 1 ? 'requests' : 'request'} pending`}
 											</CaptionCount>
+											<div>
+												<span>
+													{
+														req.repo.map((r: string, i: number) => (
+															<a key={`${i}${r}`} href={r} target="_blank" rel="noopener noreferrer">
+																{`${r}\n`}
+															</a>
+														)
+														)
+													}
+												</span>
+											</div>
 										</CaptionTooltip>
 									</Captions>
 								</Card>
