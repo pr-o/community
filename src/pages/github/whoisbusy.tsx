@@ -31,6 +31,9 @@ const repos: Array<string | undefined> = [
 	process.env.GITHUB_LEMONADE_REPO_8,
 	process.env.GITHUB_LEMONADE_REPO_9,
 	process.env.GITHUB_LEMONADE_REPO_10,
+	process.env.GITHUB_LEMONADE_REPO_11,
+	process.env.GITHUB_LEMONADE_REPO_12,
+	process.env.GITHUB_LEMONADE_REPO_13,
 ];
 
 const img = '/images/a-platform-for-builders.webp';
@@ -195,8 +198,8 @@ const sortObject = (obj: IObject) => Object.entries(obj)
 
 
 const WhoIsBusy = ({ data }: any) => {
-	const [requesters, setRequesters] = useState<Array<IData | unknown>>([]);
-	const [reviewers, setReviewers] = useState<Array<IData | unknown>>([]);
+	const [requesters, setRequesters] = useState<Array<IData | string | number>>([]);
+	const [reviewers, setReviewers] = useState<Array<IData | string | number>>([]);
 	const theme: any = useTheme();
 
 	useEffect(() => {
