@@ -31,6 +31,9 @@ const repos: Array<string | undefined> = [
 	process.env.GITHUB_LEMONADE_REPO_8,
 	process.env.GITHUB_LEMONADE_REPO_9,
 	process.env.GITHUB_LEMONADE_REPO_10,
+	process.env.GITHUB_LEMONADE_REPO_11,
+	process.env.GITHUB_LEMONADE_REPO_12,
+	process.env.GITHUB_LEMONADE_REPO_13,
 ];
 
 const img = '/images/a-platform-for-builders.webp';
@@ -195,8 +198,8 @@ const sortObject = (obj: IObject) => Object.entries(obj)
 
 
 const WhoIsBusy = ({ data }: any) => {
-	const [requesters, setRequesters] = useState<Array<IData | unknown>>([]);
-	const [reviewers, setReviewers] = useState<Array<IData | unknown>>([]);
+	const [requesters, setRequesters] = useState<Array<IData | string | number>>([]);
+	const [reviewers, setReviewers] = useState<Array<IData | string | number>>([]);
 	const theme: any = useTheme();
 
 	useEffect(() => {
@@ -281,7 +284,6 @@ const WhoIsBusy = ({ data }: any) => {
 									/>
 									<Captions>
 										<CaptionLogin>{`${rev.login}`}</CaptionLogin>
-
 										<CaptionTooltip>
 											<CaptionCount>
 												<span>{`${rev.count} `}</span>
@@ -335,6 +337,18 @@ const WhoIsBusy = ({ data }: any) => {
 												<span>{`${req.count} `}</span>
 												{`${req.count > 1 ? 'requests' : 'request'} pending`}
 											</CaptionCount>
+											<div>
+												<span>
+													{
+														req.repo.map((r: string, i: number) => (
+															<a key={`${i}${r}`} href={r} target="_blank" rel="noopener noreferrer">
+																{`${r}\n`}
+															</a>
+														)
+														)
+													}
+												</span>
+											</div>
 										</CaptionTooltip>
 									</Captions>
 								</Card>
