@@ -50,18 +50,6 @@ const ThreeDonut = () => {
     camera.position.z = 30;
 		const controls = new OrbitControls(camera, renderer.domElement)
 
-    const animate = () => {
-      requestAnimationFrame(animate);
-      mesh.rotation.x += 0.01;
-      mesh.rotation.y += 0.01;
-      mesh.rotation.z += 0.005;
-			controls.update()
-
-      renderer.render(scene, camera);
-    };
-
-    animate();
-
     const regenGeometry = () => {
       let newGeometry = new THREE.TorusGeometry(
         parameters.radius,
@@ -105,6 +93,19 @@ const ThreeDonut = () => {
 		gui
       .addColor(parameters, "color")
       .onChange(() => material.color.set(parameters.color));
+
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+      mesh.rotation.x += 0.01;
+      mesh.rotation.y += 0.01;
+      mesh.rotation.z += 0.005;
+			controls.update()
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
 
     return () => canvasRef.current?.removeChild(renderer.domElement);
   }, []);

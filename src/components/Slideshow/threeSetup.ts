@@ -1,13 +1,19 @@
 import * as THREE from 'three';
 
-export const getCamera = ({ offsetWidth, offsetHeight }) => {
+export const getCamera = ({
+	offsetWidth,
+	offsetHeight,
+}: {
+	offsetWidth: any;
+	offsetHeight: any;
+}) => {
 	const camera = new THREE.PerspectiveCamera(75, offsetWidth / offsetHeight, 0.1, 1000);
 	camera.position.set(50, 150, 0);
 
 	return camera;
 };
 
-export const getRenderer = (canvas) => {
+export const getRenderer = (canvas: any) => {
 	const context = canvas.getContext('webgl');
 	const renderer = new THREE.WebGLRenderer({
 		canvas,

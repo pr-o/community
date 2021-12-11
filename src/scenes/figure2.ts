@@ -128,7 +128,7 @@ export default class Figure {
 		return new THREE.Vector2(originalRatio.w * coverRatio, originalRatio.h * coverRatio);
 	};
 
-	multiplyMatrixAndPoint = (matrix, point) => {
+	multiplyMatrixAndPoint = (matrix: any, point: any) => {
 		const c0r0 = matrix[0];
 		const c1r0 = matrix[1];
 		const c0r1 = matrix[2];
@@ -138,7 +138,7 @@ export default class Figure {
 		return [Math.abs(x * c0r0 + y * c0r1), Math.abs(x * c1r0 + y * c1r1)];
 	};
 
-	rotateMatrix = (a) => [Math.cos(a), -Math.sin(a), Math.sin(a), Math.cos(a)];
+	rotateMatrix = (a: any) => [Math.cos(a), -Math.sin(a), Math.sin(a), Math.cos(a)];
 
 	createMesh() {
 		// this.uniforms = {
