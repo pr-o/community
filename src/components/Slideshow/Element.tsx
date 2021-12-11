@@ -57,7 +57,7 @@ const Element: React.FC<Props> = ({ scene, mouse, images, sizes, offset, clock }
 		return mesh
 	}
 
-	const createMesh = (image, hoverImage) => {
+	const createMesh = (image: any, hoverImage: any) => {
 
 		const texture = image;
 		const hoverTexture = hoverImage;
