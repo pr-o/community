@@ -21,11 +21,14 @@
 			"components/*": ["src/components/*"],
 			"interfaces/*": ["src/interfaces/*"],
 			"constants/*": ["src/constants/*"],
+			"scenes/*": ["src/scenes/*"],
 			"tests/*": ["src/tests/*"],
-			"lib/*": ["src/lib/*"]
+			"lib/*": ["src/lib/*"],
+			"utils/*": ["src/utils/*"],
+			"types/*": ["src/types/*"]
 		},
 		"types": ["@emotion/react/types/css-prop"],
-		"typeRoots": ["node_modules/@types", "src/types", "src/custom.d.ts"]
+		"typeRoots": ["node_modules/@types", "src/types", "types/custom.d.ts"]
 	},
 	"include": ["next-env.d.ts", "src/**/*"],
 	"exclude": ["node_modules"]
