@@ -91,7 +91,7 @@ const Slidshow = () => {
 		scrollbar.addListener((scroll) => onScroll(scroll))
 	}
 
-	const createMesh = (texture, hoverTexture) => {
+	const createMesh = (texture: any, hoverTexture: any) => {
 
 
 		const initialUniforms = {

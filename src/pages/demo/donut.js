@@ -1,7 +1,9 @@
 import dynamic from 'next/dynamic';
 
-const ThreeDonut = dynamic(() => import('components/demo/ThreeDonut'));
+const ThreeDonut = dynamic(() => import('components/Demo/ThreeDonut/ThreeDonut'), { ssr: false });
 
-const DonutPage = () => <ThreeDonut />;
+const DonutPage = () => {
+	return <ThreeDonut />;
+};
 
 export default DonutPage;
