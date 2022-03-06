@@ -27,19 +27,19 @@ const length = 6
 
 interface Props {
 	scene: Scene | null,
-	images: Array<{ image: string, hoverImage: string }>
+	images?: Array<{ image: string, hoverImage: string }>
+	image?: any;
+	hoverImage?: any;
 	mouse: Vector2;
 	sizes: Vector2;
 	offset: Vector2
 	clock: Clock;
+	uniforms: any;
 }
 
-const Element: React.FC<Props> = ({ scene, mouse, images, sizes, offset, clock }) => {
-	const [isHovering, setIsHovering] = useState<boolean[]>(new Array(length).fill(false))
-	const [imageObj, setImageObj] = useState<any[]>([])
-	const init = () => {
-
-	}
+const Element: React.FC<Props> = ({ uniforms, scene, mouse, images, image, hoverImage, sizes, offset, clock }) => {
+	// const [isHovering, setIsHovering] = useState<boolean[]>(new Array(length).fill(false))
+	// const [imageObj, setImageObj] = useState<any[]>([])
 
 	// const image = loader.load(this.$image?.dataset.src as string, () => this.start());
 	// const hoverImage = loader.load(this.$image?.dataset.hover as string);
@@ -62,19 +62,6 @@ const Element: React.FC<Props> = ({ scene, mouse, images, sizes, offset, clock }
 		const texture = image;
 		const hoverTexture = hoverImage;
 
-		const uniforms = {
-			u_alpha: { value: 1 },
-			u_map: { type: 't', value: texture },
-			u_ratio: { value: getRatio(sizes, { width: 600, height: 800 }) },
-			u_hovermap: { type: 't', value: hoverTexture },
-			u_hoverratio: { value: getRatio(sizes, { width: 600, height: 800 }) },
-			u_shape: { value: hoverTexture },
-			u_mouse: { value: mouse },
-			u_progressHover: { value: 0 },
-			u_progressClick: { value: 0 },
-			u_time: { value: clock.getElapsedTime() },
-			u_res: { value: new Vector2(window.innerWidth, window.innerHeight) },
-		};
 
 		const geometry = new PlaneBufferGeometry(1, 1, 1, 1);
 		const material = new ShaderMaterial({
@@ -91,49 +78,35 @@ const Element: React.FC<Props> = ({ scene, mouse, images, sizes, offset, clock }
 		mesh.position.set(offset.x, offset.y, 0);
 		mesh.scale.set(sizes.x, sizes.y, 1);
 
-		// scene?.add(mesh)
+		scene?.add(mesh)
 
-		return mesh
+		// return mesh
 	}
 
 	useEffect(() => {
 
-		setImageObj(
-			images.reduce((acc: any, image) => {
-				return [
-					...acc,
-					{
-						image: loader.load(image.image),
-						hoverImage: loader.load(image.hoverImage)
-					}
-				]
-			}, [])
-		)
+		// 	setImageObj(
+		// 		images.reduce((acc: any, image) => {
+		// 			return [
+		// 				...acc,
+		// 				{
+		// 					image: loader.load(image.image),
+		// 					hoverImage: loader.load(image.hoverImage)
+		// 				}
+		// 			]
+		// 		}, [])
+		// 	)
 
-		if (images.length)
-			images.forEach(({ image, hoverImage }) => createMesh(image, hoverImage))
+		// 	if (images.length)
+		// 		images.forEach(({ image, hoverImage }) => createMesh(image, hoverImage))
 
 
-		imageObj.forEach((image) => createMesh(image.image, image.hoverImage))
-		const meshes = imageObj.map((image) => createMesh(image.image, image.hoverImage))
-		meshes.forEach((mesh) => scene!.add(mesh))
+		// 	imageObj.forEach((image) => createMesh(image.image, image.hoverImage))
+		createMesh(image, hoverImage)
+		// meshes.forEach((mesh) => scene?.add(mesh))
 
 
 	}, []);
-
-	useEffect(() => {
-		// const lineMesh = createLineMesh()
-
-		// scene?.add(lineMesh)
-
-		console.log('imageObj =>', imageObj)
-	}, [])
-
-
-
-	const update = () => {
-
-	}
 
 	return (
 		<Fragment>
