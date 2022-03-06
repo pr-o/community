@@ -18,21 +18,16 @@ import {
 	MeshBasicMaterial,
 	ShaderMaterial,
 	Mesh,
-	Vector2
+	Vector2, Object3D
 } from 'three';
 import { Canvas } from 'lib/hooks/Canvas'
 import { getRatio } from 'utils/three'
 import Scrollbar from 'smooth-scrollbar';
 import HorizontalScrollPlugin from 'lib/utils/HorizontalScrollPlugin'
 
-// import Figure from '../scenes/figure2';
-// import useScene from 'scenes/scene2'
-// import useLight from 'scenes/light'
-// import useRenderer from 'scenes/renderer'
 import { Update } from '@material-ui/icons';
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import OrbitControls from 'three-orbitcontrols'
-import Element from 'components/Slideshow/Element'
+import Element from 'components/Demo/ThreeDonut/Element'
 
 // import OrbitControls from 'orbit-controls-es6';
 
@@ -52,6 +47,10 @@ const loader = new TextureLoader()
 const Slidshow = () => {
 	// const { h = 600, w = 600, d = 1, color = 0x00ff00 } = props;
 
+	const mouse = new Vector2(0, 0);
+	const sizes = new Vector2(0, 0);
+	const offset = new Vector2(0, 0);
+
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 	const progressWrapperRef = useRef<HTMLDivElement>(null)
 	const progressRef = useRef<HTMLSpanElement>(null)
@@ -59,23 +58,45 @@ const Slidshow = () => {
 	const [isHovering, setIsHovering] = useState<boolean[]>(new Array(length).fill(false))
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const sceneRef = useRef<Scene | null>(null);
-	const cameraRef = useRef<Camera | null>(null);
-	const lightRef = useRef<Light | null>(null);
-	const rendererRef = useRef<WebGLRenderer | null>(null);
-	const controlsRef = useRef<typeof OrbitControls | null>(null);
+	// const cameraRef = useRef<Camera | null>(null);
+	// const lightRef = useRef<Light | null>(null);
+	// const rendererRef = useRef<WebGLRenderer | null>(null);
+	// const controlsRef = useRef<typeof OrbitControls | null>(null);
+	let texture;
+	let textureSizes;
 
-	const images = [
-		{ image: img, hoverImage: hoverImg },
-		{ image: img, hoverImage: hoverImg },
-		{ image: img, hoverImage: hoverImg },
-		{ image: img, hoverImage: hoverImg },
-		{ image: img, hoverImage: hoverImg },
-		{ image: img, hoverImage: hoverImg },
-	]
+	const [uniforms, setUniforms] = useState<any>([])
 
-	const mouse = new Vector2(0, 0);
-	const sizes = new Vector2(0, 0);
-	const offset = new Vector2(0, 0);
+
+	const hoverTexture = loader.load(hoverImg)
+
+	// console.log('texture =>', texture)
+	// console.log('texture im =>', texture.image.height)
+
+
+
+	const initUniforms = (texture: any, textureSizes: any) => {
+		const initialUniform = {
+			u_alpha: { value: 1 },
+			u_map: { type: 't', value: texture },
+			u_ratio: { value: new Vector2(1, 1) },
+			u_hovermap: { type: 't', value: hoverTexture },
+			u_hoverratio: { value: new Vector2(1, 1) },
+			u_shape: { value: hoverTexture },
+			u_mouse: { value: mouse },
+			u_progressHover: { value: 1. },
+			u_progressClick: { value: 1. },
+			u_time: { value: clock.getElapsedTime() },
+			u_res: { value: new Vector2(window.innerWidth, window.innerHeight) },
+		}
+
+		setUniforms(new Array(6).fill(initialUniform))
+	}
+
+
+
+
+
 
 
 	const initScrollbar = () => {
@@ -94,41 +115,24 @@ const Slidshow = () => {
 		scrollbar.addListener((scroll) => onScroll(scroll))
 	}
 
-	// const createMesh = (texture: any, hoverTexture: any) => {
+	const createMesh = (texture: any, hoverTexture: any) => {
+		const geometry = new PlaneBufferGeometry(1, 1, 1, 1);
+		const material = new ShaderMaterial({
+			uniforms: uniforms[0],
+			vertexShader: vertexShader,
+			fragmentShader: fragmentShader,
+			defines: { PR: window.devicePixelRatio.toFixed(1) },
+		});
 
-	// 	const initialUniforms = {
-	// 		u_alpha: { value: 1 },
-	// 		u_map: { type: 't', value: texture },
-	// 		u_ratio: { value: getRatio(sizes, { width: 600, height: 800 }) },
-	// 		u_hovermap: { type: 't', value: hoverTexture },
-	// 		u_hoverratio: { value: getRatio(sizes, { width: 600, height: 800 }) },
-	// 		u_shape: { value: hoverTexture },
-	// 		u_mouse: { value: mouse },
-	// 		u_progressHover: { value: 1 },
-	// 		u_progressClick: { value: 1 },
-	// 		u_time: { value: clock.getElapsedTime() },
-	// 		u_res: { value: new Vector2(window.innerWidth, window.innerHeight) },
-	// 	};
+		const mesh = new Mesh(geometry, material);
+		mesh.scale.set(600, 600, 1);
+		mesh.position.set(0, 0, 0);
+		mesh.position.x = offset.x
+		mesh.position.y = offset.y
+		mesh.castShadow = true;
 
-	// 	// const geometry = new BoxGeometry(10, 10, 3);
-
-	// 	const geometry = new PlaneBufferGeometry(10, 10, 10, 10);
-	// 	const material = new ShaderMaterial({
-	// 		uniforms: initialUniforms,
-	// 		vertexShader: vertexShader,
-	// 		fragmentShader: fragmentShader,
-	// 		defines: { PR: window.devicePixelRatio.toFixed(1) },
-	// 	});
-
-	// 	const mesh = new Mesh(geometry, material);
-	// 	mesh.scale.set(500, 500, 1);
-	// 	mesh.position.set(0, 0, 0);
-	// 	mesh.position.x = offset.x
-	// 	mesh.position.y = offset.y
-	// 	mesh.castShadow = true;
-
-	// 	return mesh
-	// }
+		return mesh
+	}
 
 	const onScroll = ({ offset, limit }: { offset: { x: number }, limit: { x: number } }) => {
 		setProgress(Math.round(offset.x / limit.x * 100))
@@ -137,64 +141,61 @@ const Slidshow = () => {
 
 
 
-	const init = () => {
+	useEffect(() => {
 
-		const texture = loader.load(img);
-		const hoverTexture = loader.load(hoverImg)
+		loader.load(img, (_texture) => {
+			let texture = _texture
+			textureSizes = {
+				width: texture.image.width,
+				height: texture.image.height
+			}
+			initUniforms(texture, textureSizes)
+		});
 
 		const fov = (180 * (2 * Math.atan(window.innerHeight / 2 / PERSPECTIVE))) / Math.PI;
 
-		cameraRef.current = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, 100);
-		cameraRef.current.position.set(0, 0, PERSPECTIVE);
+		const camera = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, 1000);
+		camera.position.set(0, 0, PERSPECTIVE);
 
 
-		lightRef.current = new AmbientLight(0xffffff, 2);
 
-		rendererRef.current = new WebGLRenderer({
-			canvas: canvasRef.current as HTMLCanvasElement,
-			alpha: true,
-		});
+		const texture = loader.load(img);
+		const hoverTexture = loader.load(hoverImg)
+		const mesh = createMesh(texture, hoverTexture)
 
-		rendererRef.current.setSize(window.innerWidth, window.innerHeight);
-		rendererRef.current.setPixelRatio(window.devicePixelRatio);
+		sceneRef.current.add(mesh)
 
-		sceneRef.current = new Scene();
-		sceneRef.current.add(cameraRef.current)
-		sceneRef.current.add(lightRef.current);
 
-		// const mesh = createMesh(texture, hoverTexture)
+		const update = () => {
+			requestAnimationFrame(update)
+			// const time = clock.getElapsedTime()
+			// controlsRef.current!.update()
+			renderer.render(sceneRef.current as Scene, camera)
+		}
 
-		// sceneRef.current.add(mesh)
-		// cameraRef.current.lookAt(mesh as any)
-		// controlsRef.current = new OrbitControls(cameraRef.current, rendererRef.current.domElement)
-		// controlsRef.current.enableZoom = false
-		// controlsRef.current.enableDamping = true
+		update()
+	}, [])
 
-		window.addEventListener('mousemove', (e) => onMouseMove(e));
-	}
+	// const texture = loader.load(img);
+	// const hoverTexture = loader.load(hoverImg)
+
+
+	// camera.lookAt(mesh as any)
+	// controlsRef.current = new OrbitControls(camera, renderer.domElement)
+	// controlsRef.current.enableZoom = false
+	// controlsRef.current.enableDamping = true
+
+	// window.addEventListener('mousemove', (e) => onMouseMove(e));
 
 	useEffect(() => {
 		initScrollbar()
 
-		init()
-
-		update()
-
 		return () => Scrollbar.destroyAll()
 	}, []);
-
-	const update = () => {
-		requestAnimationFrame(update)
-		const time = clock.getElapsedTime()
-		// controlsRef.current!.update()
-		rendererRef.current!.render(sceneRef.current!, cameraRef.current!)
-	}
-
 
 
 
 	const onMouseMove = (event: MouseEvent) => {
-
 		gsap.to(mouse, {
 			x: (event.clientX / window.innerWidth) * 2 - 1,
 			y: -(event.clientY / window.innerHeight) * 2 + 1,
@@ -202,58 +203,31 @@ const Slidshow = () => {
 		});
 	}
 
+
+
+
 	return (
-		<ScrollableSection>
 
-			<ScrollArea ref={scrollAreaRef}>
-				<SlideShowList>
-					<Element
-						scene={sceneRef.current}
-						images={images}
-						mouse={mouse}
-						sizes={sizes}
-						offset={offset}
-						clock={clock} />
-					{/* {[1, 2, 3, 4, 5, 6, 7].map((el, index) => (
-						<Element scene={sceneRef.current}  key={`${index}`}
-						//  className={'image-tiles'}
-						>
+		<ArticleTilee>
+			<a href="#">
+				<FigureTile>
+					<ImageTile
+						id='image-tile'
+						// src={blankSVG}
+						src={img}
+						data-src={img}
+						data-hover={hoverImg}
+						alt="Woods Forests" />
+				</FigureTile>
+				<TileContent>
+					<TileTitle>{` Woods &`}<TitleOffset>Forests</TitleOffset></TileTitle>
+					<TitleCTA>
+						<ButtonInline>See more</ButtonInline>
+					</TitleCTA>
+				</TileContent>
+			</a>
+		</ArticleTilee>
 
-						</Element>
-					))} */}
-					{/* {[1, 2, 3, 4, 5, 6, 7].map((el, index) => (
-						<SlideShowListEl key={`${index}`} className={'image-tiles'}>
-
-							<ArticleTile>
-								<a href="#">
-									<FigureTile>
-										<ImageTile
-											id='image-tile'
-											// src={blankSVG}
-											src={img}
-											data-src={img}
-											data-hover={hoverImg}
-											alt="Woods Forests" />
-									</FigureTile>
-									<TileContent>
-										<TileTitle>{`${index}: Woods &`}<TitleOffset>Forests</TitleOffset></TileTitle>
-										<TitleCTA>
-											<ButtonInline>See more</ButtonInline>
-										</TitleCTA>
-									</TileContent>
-								</a>
-							</ArticleTile>
-						</SlideShowListEl>
-					))} */}
-
-				</SlideShowList >
-			</ScrollArea >
-			<SlideshowProgressWrapper ref={progressWrapperRef}>
-				<SlideshowProgress ref={progressRef} progress={progress ?? 0} />
-			</SlideshowProgressWrapper>
-			<Canvas ref={canvasRef} />
-
-		</ScrollableSection>
 	);
 };
 
@@ -292,6 +266,9 @@ const SlideShowList = styled.ul`
 
 const SlideShowListEl = styled.li`
 	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	width: 100%;
 	z-index: 933;
 	min-width: 25rem;
@@ -303,14 +280,14 @@ const SlideShowListEl = styled.li`
 		box-sizing: content-box;
 	}
 
-	&:nth-child(1n) {
+	&:nth-of-type(1n) {
 		.tile__content {
 			color: red;
 		}
 	}
 `
 
-const ArticleTile = styled.section`
+const ArticleTilee = styled.section`
 	position: relative;
 `
 
@@ -345,7 +322,7 @@ const TileTitle = styled.h2`
 	margin-left: -10%;
 	white-space: nowrap;
 	position: relative;
-	z-index: 9999999;
+	z-index: 999;
 	font-size: calc(2rem + 2.5vw);
 	/* font-size: calc(10rem + 3vw); */
 `
@@ -395,11 +372,14 @@ const SlideshowProgress = styled.span<SlideshowProgressProps>`
 `
 
 const ImageTile = styled.img`
-	/* display: block; */
+	display: block;
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100%;
+	min-width: 25rem;
+	min-height: 25rem;
+
 	height: 100%;
 	z-index: 9999;
 	object-fit: cover;
@@ -407,4 +387,3 @@ const ImageTile = styled.img`
 	/* transition: opacity .3s; */
 	/* border: 4px dotted #008080; */
 `
-

@@ -12,7 +12,7 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, any>(function Canvas(
 
 	const canvasRef = React.useRef<HTMLCanvasElement>(null!)
 
-	useEffect(() => { }, [])
+	// useEffect(() => { }, [])
 
 	return (
 		// <StyledDiv
@@ -37,8 +37,7 @@ const StyledDiv = styled.div`
 	width: 100%;
 	height: 100%;
 	z-index: 20;
-	overflow-x: hidden;
-	overflow-y: hidden;
+	overflow: hidden;
 	border: 3px solid blue;
 `
 
@@ -50,6 +49,6 @@ const StyledCanvas = styled.canvas`
 	bottom: 0;
 	width: 100%;
 	height: 100%;
-	z-index: -6;
-	border: 1px solid red;
+	z-index: 9999;
+	border: 1px solid blue;
 `
