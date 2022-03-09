@@ -1,8 +1,9 @@
+import { useEffect, useState, useRef, Fragment, ReactElement } from 'react';
 import dynamic from 'next/dynamic';
 import CanvasLayout from 'layouts/CanvasLayout'
 import styled from '@emotion/styled';
 
-const Frames = dynamic(() => import('components/Demo/ThreeDonut/Frames'), { ssr: false });
+const Frames = dynamic<{}>(() => import('components/Demo/ThreeDonut/Frames'), { ssr: false });
 
 const AboutPage = () => {
 	return (
