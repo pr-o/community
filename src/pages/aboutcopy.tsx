@@ -1,70 +1,41 @@
-import React, { useRef, MutableRefObject, useEffect, useState } from 'react';
+import { useEffect, useState, useRef, Fragment, ReactElement } from 'react';
+import dynamic from 'next/dynamic';
+import CanvasLayout from 'layouts/CanvasLayout'
 import styled from '@emotion/styled';
 
-import Image from 'next/image'
-import Link from 'next/link'
-import { ThumbUpAlt, Update } from '@material-ui/icons';
-import Slidshow from 'components/Slideshow/List';
-import * as THREE from 'three';
+interface Props {
+	image: any;
+	hoverImage: any;
+}
 
-import { css, useTheme } from '@emotion/react';
+const FramesCopy = dynamic<Props>(() => import('components/Demo/ThreeDonut/Framescopy'), { ssr: false });
 
 const img = '/images/a-thousand-paths-dark.jpg';
 const hoverImg = '/images/clint-mckoy.jpg'
-const headerImage = '/images/a-thousand-paths-dark.jpg';
-const blankSVG = `data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%3E%3C/svg%3E`
-
-import Scrollbar from 'smooth-scrollbar';
-
-import { Canvas } from 'lib/hooks/Canvas'
-import { gsap, Power2 } from 'gsap';
 
 
-const length = 8
-
-const AboutCopy = () => {
-	const theme: any = useTheme();
-	// const scrollbarRef = React.useRef<any>(null)
-	// const sceneRef = React.useRef<any>(null)
-	// const renderersRef = React.useRef<any>(null)
-	// const cameraRef = React.useRef<any>(null)
-
-	// let scene, camera,
-
-
-
+const AboutPage = () => {
 	useEffect(() => {
-
-		// const scene = new Scene();
-
-		// const container = document.getElementById('stage');
-
-		// const els = document.getElementById('image-tile')
-		// const els = document.querySelectorAll('#image-tile')
-
-		// console.log('els', els)
-		// els[0].addEventListener('mouseenter', (e) => { console.log('enter', e) });
-		// els?.addEventListener('mouseenter', (e) => { console.log('enter', e) })
-		// els.forEach((el) => el.addEventListener('mouseenter', () => onPointerEnter()))
-
+		const $tiles = document.querySelectorAll('.slideshow-list__el')
 	}, [])
 
-
-
-
 	return (
-		<Wrapper>
-			<Slidshow />
-		</Wrapper>
+		<CanvasLayout>
+			<FramesCopy image={img} hoverImage={hoverImg} />
+		</CanvasLayout>
 	)
-}
-
-export default AboutCopy;
+};
 
 
-const Wrapper = styled.div`
-	width: 100%;
+export default AboutPage;
+
+const Page = styled.div`
+	position: relative;
+	display: block;
+	z-index: 5;
 	height: 100%;
-	overflow-x: hidden;
-	overflow-y: hidden;
+	overflow: hidden;
+	background-color: #525252;
+	cursor: ew-resize;
 `
+
