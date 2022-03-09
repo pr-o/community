@@ -1,8 +1,8 @@
-import React, { FC, ReactChild, ReactChildren } from 'react';
+import React, { FC, ReactChild, ReactChildren, ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 interface Props {
-	children?: (string | Element)[];
+	children?: any;
 };
 
 const CanvasLayout: FC<Props> = ({ children }) => {

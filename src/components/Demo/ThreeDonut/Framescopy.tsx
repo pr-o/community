@@ -58,12 +58,11 @@ interface ScrollEvent extends Event {
 }
 
 interface Props {
-	index: number;
 	image: any;
 	hoverImage: any;
 }
 
-const Slideshow: React.FC<Props> = ({ index, image, hoverImage }) => {
+const Slideshow: React.FC<Props> = ({ image, hoverImage }) => {
 
 	const loader = new TextureLoader()
 	const texture = loader.load(image);
@@ -79,7 +78,7 @@ const Slideshow: React.FC<Props> = ({ index, image, hoverImage }) => {
 
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 
-	const map = (value, min1, max1, min2, max2) => min2 + (max2 - min2) * (value - min1) / (max1 - min1)
+	const map = (value: number, min1: number, max1: number, min2: number, max2: number) => min2 + (max2 - min2) * (value - min1) / (max1 - min1)
 
 
 	const onScroll = ({ offset, limit }: { offset: { x: number }, limit: { x: number } }) => {

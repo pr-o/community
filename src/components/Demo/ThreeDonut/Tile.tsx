@@ -92,8 +92,8 @@ export default class Tile {
 		this.image = image
 		this.hoverImage = hoverImage
 
-		this.texture = this.loader.load(image, (image) => { this.t = image; });
-		this.hoverTexture = this.loader.load(hoverImage, (image) => { this.ht = image; })
+		this.texture = this.loader.load(image, (image: any) => { this.t = image; });
+		this.hoverTexture = this.loader.load(hoverImage, (image: any) => { this.ht = image; })
 		this.shape = this.loader.load('/images/shapes/sung.jpeg')
 
 		// this.t = t
@@ -114,7 +114,7 @@ export default class Tile {
 	bindEvent() {
 		// document.addEventListener('tile:zoom', ({ detail }) => { this.zoom(detail) })
 
-		document.addEventListener('onClickClose', ({ detail }) => {
+		document.addEventListener('onClickClose', ({ detail }: any) => {
 
 			this.hasClicked = false
 			this.zoom({ index: 1, open: true })
@@ -128,20 +128,20 @@ export default class Tile {
 		window.addEventListener('resize', () => { this.onResize() })
 		// window.addEventListener('wheel', (e) => { this.onScroll(e) })
 
-		this.anchorElement.addEventListener('click', (e) => { this.onClick(e) })
+		this.anchorElement.addEventListener('click', (e: any) => { this.onClick(e) })
 		this.anchorElement.addEventListener('mouseenter', () => { this.onMouseEnter() })
 		this.anchorElement.addEventListener('mouseleave', () => { this.onMouseLeave() })
 
 
 		this.Scroll = Scrollbar.get(document.querySelector('#scrollarea') as HTMLElement)
 
-		this.Scroll.addListener((scroll) => this.onScroll(scroll))
+		this.Scroll.addListener((scroll: any) => this.onScroll(scroll))
 	}
 
 	disableScroll() { this.Scroll.updatePluginOptions('horizontalScroll', { events: [] }) }
 	enableScroll() { this.Scroll.updatePluginOptions('horizontalScroll', { events: [/wheel/] }) }
 
-	onClick(e) {
+	onClick(e: any) {
 		e.preventDefault()
 
 		// if (APP.Layout.isMobile) return
@@ -159,7 +159,7 @@ export default class Tile {
 	}
 
 
-	zoom({ index, open }) {
+	zoom({ index, open }: any) {
 		// this.hasClicked = true
 
 		// const shouldZoom = true
@@ -258,46 +258,6 @@ export default class Tile {
 		// }, 0.35 / this.stgs.lines.length)
 	}
 
-	hide(shouldHide, force) {
-
-		gsap.to(this.mesh.scale, {
-			duration: 1,
-			// delay: 0.3,
-			x: 500,
-			y: 500,
-			// ease: Expo.easeInOut,
-			ease: 'power2.inout',
-
-			onUpdate: () => {
-
-				this.hasClicked = false
-				gsap.to(this.uniforms.u_progressHover, {
-					duration: 1.2,
-					// value: this.shouldZoom ? 2 : 0,
-					ease: 'power2.inout'
-				})
-				this.getBounds();
-
-				// ev('view:toggle', { shouldOpen: shouldZoom, target: this })
-			},
-		})
-
-		// const delay = shouldHide && !force ? 0 : 1.2
-		// gsap.to(this.uniforms.u_alpha, {
-		// 	duration: 0.5,
-		// 	delay,
-		// 	value: shouldHide && !force ? 0 : 1,
-		// 	ease: Power3.easeIn,
-		// })
-
-		// gsap.to(this.anchorElement, {
-		// 	duration: 0.5,
-		// 	delay,
-		// 	alpha: shouldHide && !force ? 0 : 1,
-		// 	force3D: true,
-		// })
-
-	}
 
 	onMouseEnter() {
 		this.isHovering = true
@@ -352,22 +312,22 @@ export default class Tile {
 		}
 	}
 
-	onScroll({ offset, limit }) {
+	onScroll({ offset, limit }: any) {
 		this.scroll = offset.x / limit.x
 	}
 
 
 
-	preload(images, allImagesLoadedCallback) {
+	preload(images: any, allImagesLoadedCallback: any) {
 		let loadedCounter = 0
 		const toBeLoadedNumber = images.length
-		const preloadImage = (image, anImageLoadedCallback) => {
+		const preloadImage = (image: any, anImageLoadedCallback: any) => {
 			const texture = this.loader.load(image, anImageLoadedCallback)
 			texture.center.set(0.5, 0.5)
 			this.images.push(texture)
 		}
 
-		images.forEach((image) => {
+		images.forEach((image: any) => {
 			preloadImage(image, () => {
 				loadedCounter += 1
 				if (loadedCounter === toBeLoadedNumber) {
