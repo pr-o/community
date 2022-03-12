@@ -26,51 +26,40 @@ import THREE, {
 import vertexShader from 'lib/glsl/vertexShader.glsl';
 import Scrollbar from 'smooth-scrollbar'
 import { getRatio } from 'utils/three';
+import { Collapse } from '@material-ui/core';
 
 export default class Tile {
 	scene: Scene;
 	mainImage: any;
-	images: any;
+	images: any = [];
 	sizes: any;
 	offset: any;
 	vertexShader: any;
 	fragmentShader: any;
 	clock: any;
 	mouse: any;
-	delta: any;
-	hasClicked: any;
-	isZoomed: any;
+	delta: number = 0;
+	hasClicked: boolean = false;
+	index: number;
+	selectedIndex: number = -1;
+	selected: boolean = false;
+	isZoomed: any = false;
 	loader: any;
-	// preload: any;
 	mesh: any;
 	uniforms: any;
 	scroll: number = 0;
-	Scroll: any;
+	scrollbar: any;
 	prevScroll: number = 0;
 	isHovering: boolean = false;
-	image: any;
-	hoverImage: any;
-	texture: any;
-	hoverTexture: any;
-	loadedCounter: number = 0
-	toLoadCounter: number = 2
 	anchorElement: any;
-	shape: any = null;
-	shapeTexture: any;
-	textureImage: any;
-	hoverTextureImage: any;
-	t: any;
-	ht: any;
-	index: string;
-	detailsView: boolean = false;
+	detailView: boolean = false;
 
-
-	constructor($el: any, index: string, scene: any, image: string, hoverImage: string, duration: any, fragmentShader: any, t: any, ht: any) {
+	constructor($el: any, index: number, scene: any, image: string, hoverImage: string, fragmentShader: any) {
 		this.scene = scene
 
 		this.anchorElement = $el.querySelector('a')
 		this.mainImage = $el.querySelector('img')
-		this.images = []
+		// this.images = []
 		this.sizes = new Vector2(0, 0)
 		this.offset = new Vector2(0, 0)
 
@@ -78,48 +67,29 @@ export default class Tile {
 		this.fragmentShader = fragmentShader
 
 		this.clock = new Clock()
-
 		this.mouse = new Vector2(0, 0)
-
-		this.scroll = 0
-		this.prevScroll = 0
-		this.delta = 0
-		this.hasClicked = false
-		this.isZoomed = false
 
 		this.loader = new TextureLoader()
 
-		this.image = image
-		this.hoverImage = hoverImage
-
-		this.texture = this.loader.load(image, (image: any) => { this.t = image; });
-		this.hoverTexture = this.loader.load(hoverImage, (image: any) => { this.ht = image; })
-		this.shape = this.loader.load('/images/shapes/sung.jpeg')
-
-		// this.t = t
-		// this.ht = ht
 		this.index = index
 		this.bindEvent()
 
-		// this.preload(this.init())
-
-		// if (this.texture.image)
-
-		// this.init()
-		this.preload([this.image, this.hoverImage, '/images/shapes/sung.jpeg'], () => { this.init() })
-
+		this.preload([image, hoverImage, '/images/shapes/sung.jpeg'], () => { this.init() })
 
 	}
 
 	bindEvent() {
-		// document.addEventListener('tile:zoom', ({ detail }) => { this.zoom(detail) })
+		document.addEventListener('onClickTile', ({ detail }) => { console.log('detail', detail); this.zoom(detail) })
 
-		document.addEventListener('onClickClose', ({ detail }: any) => {
 
-			this.hasClicked = false
-			this.zoom({ index: 1, open: true })
-			console.log('recccc')
+		document.addEventListener('onClickClose', () => {
+
+			// this.zoom({ index: 1, open: true })
+			this.zoom({ target: null, open: false })
+
 		})
+
+
 
 
 		// window.addEventListener('resize', () => { this.onResize() })
@@ -133,37 +103,52 @@ export default class Tile {
 		this.anchorElement.addEventListener('mouseleave', () => { this.onMouseLeave() })
 
 
-		this.Scroll = Scrollbar.get(document.querySelector('#scrollarea') as HTMLElement)
+		this.scrollbar = Scrollbar.get(document.querySelector('#scrollarea') as HTMLElement)
 
-		this.Scroll.addListener((scroll: any) => this.onScroll(scroll))
+		this.scrollbar.addListener((scroll: any) => { this.onScroll(scroll) })
 	}
 
-	disableScroll() { this.Scroll.updatePluginOptions('horizontalScroll', { events: [] }) }
-	enableScroll() { this.Scroll.updatePluginOptions('horizontalScroll', { events: [/wheel/] }) }
+	disableScroll() { this.scrollbar.updatePluginOptions('horizontalScroll', { events: [] }) }
+	enableScroll() { this.scrollbar.updatePluginOptions('horizontalScroll', { events: [/wheel/] }) }
 
 	onClick(e: any) {
 		e.preventDefault()
 
-		// if (APP.Layout.isMobile) return
 
-		if (this.detailsView) return;
 		if (!this.mesh) return
 
-		this.hasClicked = !this.hasClicked
+		this.hasClicked = true
 
-		const index = this.mesh.name;
-
-
-		this.zoom({ index, open: true })
+		const data = { target: this, open: true }
+		const ev = new CustomEvent('toggleDetail', { detail: data })
+		document.dispatchEvent(ev)
 
 	}
 
+	hide(shouldHide: boolean, open: boolean) {
+		const delay = shouldHide && !open ? 0 : 1.2
+		const duration = 0.5
 
-	zoom({ index, open }: any) {
-		// this.hasClicked = true
+		gsap.to(this.uniforms.u_alpha, {
+			delay,
+			duration,
+			value: shouldHide && !open ? 0 : 1,
+			ease: 'power3.easeIn',
+		})
 
-		// const shouldZoom = true
-		const shouldZoom = this.hasClicked
+		gsap.to(this.anchorElement, {
+			delay,
+			duration,
+			alpha: shouldHide && !open ? 0 : 1,
+			force3D: true,
+		})
+	}
+
+	zoom({ target, open }) {
+
+		const shouldZoom = target === this
+		const delay = shouldZoom ? 0.4 : 0
+		const duration = 1.2
 
 		const newScl = {
 			x: shouldZoom ? window.innerWidth * 0.44 : this.sizes.x,
@@ -177,95 +162,72 @@ export default class Tile {
 
 		const newRatio = getRatio(newScl, this.images[1].image)
 
-		this.hasClicked ? this.disableScroll() : this.enableScroll()
+		this.isZoomed ? this.disableScroll() : this.enableScroll()
 
-		this.hasClicked ?
-			this.scene.traverse((obj) => {
-				console.log('xx =>>', obj)
-				if (obj.type === 'Mesh' && obj.name !== `${index}`)
-					// obj.visible = false;
-					obj.position.z = 10000;
-			})
-			: this.scene.traverse((obj) => {
-				console.log('xx =>>', obj)
-				if (obj.type === 'Mesh')
-					// obj.visible = true;
-					// obj.position.z = 1;
-					gsap.to(obj.position, {
-						duration: 0.8,
-						z: 1,
-						ease: 'power2.inout',
-					})
-			})
+
+		this.hide(!shouldZoom, !open)
+
 
 		gsap.to(this.uniforms.u_progressClick, {
 			duration: 1.2,
 			value: shouldZoom ? 1 : 0,
-			// value: 1,
-			// ease: Power2.easeInOut,
-			ease: 'power2.inout',
-
+			ease: 'power2.inOut',
 			onComplete: () => {
+
 				this.isZoomed = shouldZoom
-				// this.hasClicked = true
+				this.hasClicked = open
 
 				gsap.to(this.uniforms.u_progressHover, {
-					duration: 1.2,
+					duration: 1,
 					value: shouldZoom ? 1 : 0,
-					ease: 'power2.inout'
+					ease: 'power2.inOut',
 				})
 
-				// ev('view:toggle', { shouldOpen: shouldZoom, target: this })
 			},
 		})
 
 
 		gsap.to(this.mesh.scale, {
-			duration: 1.2,
-			// delay: 0.3,
+			delay,
+			duration,
 			x: newScl.x,
 			y: newScl.y,
-			// ease: Expo.easeInOut,
-			ease: 'power2.inout',
-
+			ease: 'expo.inOut',
 			onUpdate: () => { this.getBounds() },
 		})
 
 
 		gsap.to(this.mesh.position, {
-			duration: 1.2,
-			delay: 0.3,
+			delay,
+			duration,
 			x: newPos.x,
 			y: newPos.y,
-			// ease: Expo.easeInOut,
-			ease: 'power2.inout',
+			ease: 'expo.inOut',
 		})
 
 		gsap.to(this.uniforms.u_hoverratio.value, {
-			duration: 1.2,
-			// delay: 0.3,
+			delay,
+			duration,
 			x: newRatio.x,
 			y: newRatio.y,
-			// ease: Expo.easeInOut,
-			ease: 'power2.inout',
+			ease: 'expo.inOut',
 		})
 
-		// gsap.staggerTo(this.stgs.lines, {
-		// 	duration: 1,
+		// gsap.to(this.stgs.lines, {
+		//    duration,
 		// 		yPercent: shouldZoom ? 100 : 0,
-		// 		ease: Expo.easeInOut,
+		// 		ease: expo.InOut,
 		// 		force3D: true,
-		// }, 0.35 / this.stgs.lines.length)
+		// stagger: 0.25
+		// }, 0.255 / this.stgs.lines.length)
 	}
 
 
 	onMouseEnter() {
+		if (!this.mesh) return;
 		this.isHovering = true
 
-		if (this.isZoomed || this.hasClicked) return
-
-
-		if (!this.mesh) return
+		if (this.isZoomed || this.hasClicked) return;
 
 		gsap.to(this.uniforms.u_progressHover, {
 			value: 1,
@@ -275,27 +237,26 @@ export default class Tile {
 	}
 
 	onMouseLeave() {
-		if (!this.mesh || this.isZoomed || this.hasClicked) return
-		// if (!this.mesh) return
+
+		if (!this.mesh || this.isZoomed || this.hasClicked) return;
 
 
 		gsap.to(this.uniforms.u_progressHover, {
 			value: 0,
-			// duration: 1,
+			duration: 1,
 			ease: 'power2.inout',
-			onComplete: () => {
-				this.isHovering = false
-			},
+			onComplete: () => { this.isHovering = false },
 		});
 	}
 
 	onMouseMove = (event: MouseEvent) => {
-		if (this.isZoomed || this.hasClicked) return
+
+		if (this.isZoomed || this.hasClicked) return;
 
 		gsap.to(this.mouse, {
+			duration: 0.5,
 			x: (event.clientX / window.innerWidth) * 2 - 1,
 			y: -(event.clientY / window.innerHeight) * 2 + 1,
-			duration: 0.5,
 		});
 
 	}
@@ -312,10 +273,7 @@ export default class Tile {
 		}
 	}
 
-	onScroll({ offset, limit }: any) {
-		this.scroll = offset.x / limit.x
-	}
-
+	onScroll({ offset, limit }: any) { this.scroll = offset.x / limit.x }
 
 
 	preload(images: any, allImagesLoadedCallback: any) {
@@ -338,20 +296,16 @@ export default class Tile {
 	}
 
 	init() {
-		this.getBounds()
-
-		// const texture = this.images[0]
-		// const hoverTexture = this.images[1]
-		// const shape = this.images[2]
 
 		const [texture, hoverTexture, shape] = this.images
 
+		this.getBounds()
 
 		this.uniforms = {
 			u_alpha: { value: 1 },
-			u_map: { type: 't', value: this.texture },
+			u_map: { type: 't', value: texture },
 			u_ratio: { value: getRatio(this.sizes, texture.image) },
-			u_hovermap: { type: 't', value: this.hoverTexture },
+			u_hovermap: { type: 't', value: hoverTexture },
 			u_hoverratio: { value: getRatio(this.sizes, hoverTexture.image) },
 			u_shape: { value: shape },
 			u_mouse: { value: this.mouse },
@@ -362,6 +316,7 @@ export default class Tile {
 		}
 
 		const geometry = new PlaneBufferGeometry(1, 1, 1, 1);
+
 		const material = new ShaderMaterial({
 			uniforms: this.uniforms,
 			vertexShader: vertexShader,
@@ -372,23 +327,20 @@ export default class Tile {
 				PR: window.devicePixelRatio.toFixed(1),
 			},
 		});
-		this.mesh = new Mesh(geometry, material);
 
+		this.mesh = new Mesh(geometry, material);
 
 		this.mesh.position.x = this.offset.x
 		this.mesh.position.y = this.offset.y
 
-		this.mesh.name = `${this.index}`
+		this.mesh.scale.set(this.sizes.x, this.sizes.y, 1)
 
 		this.scene.add(this.mesh);
-
 	}
 
 	onResize() {
-		// location.reload()
 
 		this.getBounds()
-
 
 		if (!this.mesh) return
 
@@ -397,8 +349,7 @@ export default class Tile {
 	}
 
 	move() {
-		// if (!this.mesh) return;
-		if (!this.mesh || this.isZoomed || this.hasClicked) return
+		if (!this.mesh || this.isZoomed || this.hasClicked) return;
 
 		this.getBounds()
 
@@ -411,7 +362,7 @@ export default class Tile {
 			x: this.sizes.x - this.delta,
 			y: this.sizes.y - this.delta,
 			z: 3,
-			duration: 0.5
+			duration: 0.25
 		})
 
 	}
