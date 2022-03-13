@@ -52,24 +52,22 @@ interface ScrollEvent extends Event {
 	clientX: number;
 }
 
-const map = (value: number, min1: number, max1: number, min2: number, max2: number) =>
-	min2 + (max2 - min2) * (value - min1) / (max1 - min1)
-
-
 const Slideshow: React.FC = () => {
 
 	const [progress, setProgress] = useState<number>(0)
+	const progressWrapperRef = useRef<HTMLElement | null>(null)
 	const progressRef = useRef<HTMLSpanElement>(null)
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const sceneRef = useRef<Scene | null>(null);
+	const scrollbarRef = useRef<Scrollbar | null | undefined>(null)
+	const backButtonRef = useRef<HTMLDivElement | null>(null)
 
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 
 	const onScroll = ({ offset, limit }: { offset: { x: number }, limit: { x: number } }) => {
-		const prog = map(offset.x / limit.x * 100, 0, 100, 5, 100)
+		const prog = offset.x / limit.x * 100
 		setProgress(prog)
 	}
-
 
 	const initScrollbar = () => {
 		Scrollbar.use(HorizontalScrollPlugin)
@@ -85,36 +83,63 @@ const Slideshow: React.FC = () => {
 		scrollbar.track.xAxis.element.remove()
 		scrollbar.track.yAxis.element.remove()
 		scrollbar.addListener((scroll) => onScroll(scroll))
+		scrollbarRef.current = scrollbar
 	}
 
 
+	const toggleScroll = (lock: boolean) => {
+		const duration = lock ? 0 : 1.5
+		const delay = lock ? 0 : 1
+		const alpha = lock ? 0 : 1
+
+		gsap.to(progressWrapperRef.current, { delay, duration, alpha, force3D: true })
+
+		gsap.delayedCall(duration, () => {
+			scrollbarRef.current?.updatePluginOptions('horizontalScroll', {
+				events: lock ? false : [/wheel/],
+			})
+		})
+	}
+
+	const onClickClose = () => {
+		const e = new CustomEvent('onClickClose')
+		document.dispatchEvent(e)
+
+		toggleScroll(false)
+	}
 
 	const onToggleView = (detail) => {
+		const e = new CustomEvent('onClickTile', { detail })
+		document.dispatchEvent(e)
 
-		const ev = new CustomEvent('onClickTile', { detail })
-		document.dispatchEvent(ev)
+		toggleScroll(detail.open)
 	}
 
+
 	useEffect(() => {
+		scrollbarRef.current = Scrollbar.get(document.querySelector('#scrollarea') as HTMLElement)
 
 		window.addEventListener('resize', () => { onResize() })
 		document.addEventListener('toggleDetail', ({ detail }) => { onToggleView(detail) })
+
 
 		initScrollbar()
 		sceneRef.current = new Scene();
 		const $tiles = document.querySelectorAll('.slideshow-list__el')
 
+		progressWrapperRef.current = document.getElementById('progress-wrapper')
+
 		const images = [
-			'/images/a-thousand-paths-dark.jpg',
-			'/images/a-thousand-paths-dark.jpg',
+			'/images/usc-trojan.png',
+			'/images/lemon.jpg',
 			'/images/a-thousand-paths-dark.jpg',
 			'/images/a-thousand-paths-dark.jpg',
 			'/images/a-thousand-paths-dark.jpg',
 		]
 
 		const hoverImages = [
-			'/images/clint-mckoy.jpg',
-			'/images/clint-mckoy.jpg',
+			'/images/usc-logo.jpg',
+			'/images/day1.jpeg',
 			'/images/clint-mckoy.jpg',
 			'/images/clint-mckoy.jpg',
 			'/images/clint-mckoy.jpg',
@@ -128,8 +153,6 @@ const Slideshow: React.FC = () => {
 			revealShader,
 		]
 
-
-
 		const tiles = Array.from($tiles).map(($el, i) =>
 			new Tile($el, i, sceneRef.current, images[i], hoverImages[i], fragmentShaders[i])
 		)
@@ -139,14 +162,13 @@ const Slideshow: React.FC = () => {
 		const camera = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, 1000);
 		camera.position.set(0, 0, PERSPECTIVE);
 
-
-
 		const light = new AmbientLight(0xffffff, 2);
 
 		const renderer = new WebGLRenderer({
 			canvas: canvasRef.current as HTMLCanvasElement,
 			alpha: true,
 		});
+
 		renderer.setClearAlpha(1)
 
 		renderer.setSize(window.innerWidth, window.innerHeight);
@@ -171,18 +193,12 @@ const Slideshow: React.FC = () => {
 			tiles.forEach((tile) => tile.update())
 
 			renderer.render(sceneRef.current as Scene, camera as Camera)
-
 		}
 
 		update()
 
 		return () => { Scrollbar.destroyAll() }
 	}, [])
-
-	const onClickClose = () => {
-		const e = new CustomEvent('onClickClose')
-		document.dispatchEvent(e)
-	}
 
 
 	return (
@@ -238,19 +254,16 @@ const Slideshow: React.FC = () => {
 							</SlideShowEl>
 						</SlideShowList>
 					</ScrollArea>
-					<SlideshowProgressWrapper>
+					<SlideshowProgressWrapper id='progress-wrapper'>
 						<SlideshowProgress ref={progressRef} progress={progress ?? 0} />
 					</SlideshowProgressWrapper>
 				</ScrollAreaCtn>
 				<Aside>
-					<div >
-						<button onClick={() => { console.log('onClose'); onClickClose() }}>
-
-							<div>
-								<FastRewind className={'animated-svg'} width={'4vw'} height={'4vw'} fill={'#008080'} />
-							</div>
+					<BackButtonWrapper ref={backButtonRef}>
+						<button onClick={() => { onClickClose() }}>
+							<FastRewind className={'animated-svg'} width={'4vw'} height={'4vw'} fill={'#008080'} />
 						</button>
-					</div>
+					</BackButtonWrapper>
 				</Aside>
 				<Canvas ref={canvasRef} >
 				</Canvas>
@@ -258,30 +271,16 @@ const Slideshow: React.FC = () => {
 		</main>
 
 	)
-
 };
 
+export default Slideshow;
 
 const Aside = styled.aside`
 	border: 2px solid red;
-	position: fixed;
+	position: absolute;
 	top: 0;
-    left: 0;
-    z-index: 99999;
-& >div {
-	display: block;
-    width: 100%;
-    height: 100%;
-    padding: 5vw;
-    color: #fff;
-
-}
-		button {
-			position: relative;
-			background: transparent;
-			border: none;
-			&:hover { cursor: pointer; }
-		}
+	left: 0;
+	z-index: 99999;
 
 	@keyframes pulse {
 		  0% { fill: #002020; transform: scale(0.8); }
@@ -289,24 +288,38 @@ const Aside = styled.aside`
 		100% { fill: #008080; transform: scale(1.1); }
 	}
 
-
-.animated-svg {
-    animation: pulse .8s linear infinite;
-}
-
+	.animated-svg {
+		animation: pulse .8s linear infinite;
+	}
 `
 
-const Wrapper = styled.div`
-position: relative;
-flex-direction: column;
-display: flex;
-width: 100%;
-min-height: 100vh;
-align-items: center;
-justify-content: center;
-z-index: 9998;
+const BackButtonWrapper = styled.div`
+	display: block;
+	width: 100%;
+	height: 100%;
+	padding: 3vw;
+	color: #fff;
 
-.detail-view {
+	button {
+		position: relative;
+		background: transparent;
+		border: none;
+		&:hover { cursor: pointer; transform: skewY(15deg) }
+	}
+`
+
+
+const Wrapper = styled.div`
+	position: relative;
+	flex-direction: column;
+	display: flex;
+	width: 100%;
+	min-height: 100vh;
+	align-items: center;
+	justify-content: center;
+	z-index: 9998;
+
+	.detail-view {
     overflow: auto;
     position: fixed;
     z-index: 90009999;
@@ -314,33 +327,29 @@ z-index: 9998;
     left: 0;
     width: 100%;
     min-height: 100vh;
-border: 1px solid red;
+		border: 1px solid red;
     opacity: 0;
-}
+	}
 `
 
 const ScrollAreaCtn = styled.section`
-    position: relative;
-
+	position: relative;
 	z-index: 9997;
 `
 
 
 const ScrollArea = styled.div`
-	/* position: relative; */
+	position: relative;
 	width: 100vw;
 `
 
 const SlideShowList = styled.ul`
 	display: flex;
 	align-items: center;
-
+	list-style: none;
 `
 
 const SlideShowEl = styled.li`
-
-display: flex;
-
 	width: 100%;
 	min-width: 30rem;
 	max-width: 40vmin;
@@ -350,27 +359,27 @@ display: flex;
 		margin-left: 40vw;
 		box-sizing: content-box;
 	}
+
 	&:last-child {
 		padding-right: 10vw;
 		box-sizing: content-box;
 	}
-	& img {
-	width: 500px;
-	height: 500px;
 
-	.tile__img {
+	img {
+		width: 500px;
+		height: 500px;
 
-	display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+		.tile__img {
+			display: block;
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+			object-position: center;
+		}
 	}
-}
-
 `
 
 const SlideshowProgressWrapper = styled.div`
@@ -395,6 +404,3 @@ const SlideshowProgress = styled.span<{ progress: number }>`
 	transition: transform .1s;
 	transform: ${({ progress }) => `translateX(${-100 + progress}%)`};
 `
-
-export default Slideshow;
-

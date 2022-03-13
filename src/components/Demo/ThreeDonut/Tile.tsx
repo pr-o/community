@@ -79,24 +79,18 @@ export default class Tile {
 	}
 
 	bindEvent() {
-		document.addEventListener('onClickTile', ({ detail }) => { console.log('detail', detail); this.zoom(detail) })
-
-
-		document.addEventListener('onClickClose', () => {
-
-			// this.zoom({ index: 1, open: true })
-			this.zoom({ target: null, open: false })
-
+		document.addEventListener('onClickTile', ({ detail }) => {
+			this.zoom(detail)
 		})
 
 
+		document.addEventListener('onClickClose', () => {
+			this.zoom({ target: null, open: false })
+		})
 
-
-		// window.addEventListener('resize', () => { this.onResize() })
 
 		window.addEventListener('mousemove', (e) => { this.onMouseMove(e) })
 		window.addEventListener('resize', () => { this.onResize() })
-		// window.addEventListener('wheel', (e) => { this.onScroll(e) })
 
 		this.anchorElement.addEventListener('click', (e: any) => { this.onClick(e) })
 		this.anchorElement.addEventListener('mouseenter', () => { this.onMouseEnter() })
@@ -108,14 +102,10 @@ export default class Tile {
 		this.scrollbar.addListener((scroll: any) => { this.onScroll(scroll) })
 	}
 
-	disableScroll() { this.scrollbar.updatePluginOptions('horizontalScroll', { events: [] }) }
-	enableScroll() { this.scrollbar.updatePluginOptions('horizontalScroll', { events: [/wheel/] }) }
 
 	onClick(e: any) {
 		e.preventDefault()
-
-
-		if (!this.mesh) return
+		if (this.hasClicked || !this.mesh) return;
 
 		this.hasClicked = true
 
@@ -146,13 +136,16 @@ export default class Tile {
 
 	zoom({ target, open }) {
 
+
 		const shouldZoom = target === this
+
 		const delay = shouldZoom ? 0.4 : 0
 		const duration = 1.2
 
 		const newScl = {
-			x: shouldZoom ? window.innerWidth * 0.44 : this.sizes.x,
-			y: shouldZoom ? window.innerHeight - 140 : this.sizes.y,
+			x: shouldZoom ? this.sizes.x * 1.5 : this.sizes.x,
+			// y: shouldZoom ? window.innerHeight - 140 : this.sizes.y,
+			y: shouldZoom ? this.sizes.y * 1.5 : this.sizes.y,
 		}
 
 		const newPos = {
@@ -161,8 +154,6 @@ export default class Tile {
 		}
 
 		const newRatio = getRatio(newScl, this.images[1].image)
-
-		this.isZoomed ? this.disableScroll() : this.enableScroll()
 
 
 		this.hide(!shouldZoom, !open)
@@ -273,7 +264,10 @@ export default class Tile {
 		}
 	}
 
-	onScroll({ offset, limit }: any) { this.scroll = offset.x / limit.x }
+	onScroll({ offset, limit }: any) {
+		if (this.hasClicked) return;
+		this.scroll = offset.x / limit.x
+	}
 
 
 	preload(images: any, allImagesLoadedCallback: any) {
@@ -304,9 +298,11 @@ export default class Tile {
 		this.uniforms = {
 			u_alpha: { value: 1 },
 			u_map: { type: 't', value: texture },
-			u_ratio: { value: getRatio(this.sizes, texture.image) },
+			// u_ratio: { value: getRatio(this.sizes, texture.image) },
+			u_ratio: { value: new Vector2(1, 1) },
 			u_hovermap: { type: 't', value: hoverTexture },
-			u_hoverratio: { value: getRatio(this.sizes, hoverTexture.image) },
+			// u_hoverratio: { value: getRatio(this.sizes, hoverTexture.image) },
+			u_hoverratio: { value: new Vector2(1, 1) },
 			u_shape: { value: shape },
 			u_mouse: { value: this.mouse },
 			u_progressHover: { value: .0 },
@@ -362,7 +358,7 @@ export default class Tile {
 			x: this.sizes.x - this.delta,
 			y: this.sizes.y - this.delta,
 			z: 3,
-			duration: 0.25
+			duration: 1
 		})
 
 	}
@@ -378,7 +374,6 @@ export default class Tile {
 
 		if (!this.isHovering) return
 		this.uniforms.u_time.value += this.clock.getDelta()
-
 	}
 }
 
