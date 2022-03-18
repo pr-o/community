@@ -1,36 +1,19 @@
-import React, { useEffect, useState, useRef, Fragment, FC } from 'react';
-import { gsap, Power2 } from 'gsap';
-import { fromEvent, of } from 'rxjs';
+import React, { useEffect, useState, useRef, FC } from 'react';
+import { gsap } from 'gsap';
+import { fromEvent, of } from 'rxjs'; // fromEvent 를 통해 화살표 이용한 navigation ㄱㄱ
 import { throttle, distinctUntilKeyChanged, filter, pluck } from 'rxjs/operators';
 
 import styled from '@emotion/styled';
 
 import {
-	Clock,
 	Scene,
 	Camera,
-	Light,
 	PerspectiveCamera,
 	AmbientLight,
-	Renderer,
-	ConeGeometry,
-	LoadingManager,
-	TextureLoader,
 	WebGLRenderer,
 	BoxBufferGeometry,
-	PlaneBufferGeometry,
-	BoxGeometry,
-	DoubleSide,
-	MeshBasicMaterial,
-	ShaderMaterial,
-	Mesh,
-	Vector2, Object3D,
-	Raycaster
 } from 'three';
 import { Canvas } from 'lib/hooks/Canvas'
-import { getRatio } from 'utils/three'
-
-import OrbitControls from 'three-orbitcontrols'
 
 import vertexShader from 'lib/glsl/vertexShader.glsl';
 import shapeShader from 'lib/glsl/shapeShader.glsl';
@@ -40,19 +23,21 @@ import revealShader from 'lib/glsl/revealShader.glsl';
 import gooeyShader from 'lib/glsl/gooeyShader.glsl';
 import HorizontalScrollPlugin from 'lib/utils/HorizontalScrollPlugin'
 import Scrollbar from 'smooth-scrollbar'
+import { imagePaths, hoverImagePaths, fragmentShaderNames, shapeImagePaths } from 'components/Slideshow/imagePaths'
 
-import Tile from './Tile'
+import Slide, { OnClickTileDetail } from 'components/Slideshow/Slide'
 import FastRewind from 'components/assets/FastRewind'
 
 const blankSVG = `data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%3E%3C/svg%3E`
 
 const PERSPECTIVE = 800;
+
 interface ScrollEvent extends Event {
 	deltaY: number;
 	clientX: number;
 }
 
-const Slideshow: React.FC = () => {
+const Slideshow: FC = () => {
 
 	const [progress, setProgress] = useState<number>(0)
 	const progressWrapperRef = useRef<HTMLElement | null>(null)
@@ -108,7 +93,7 @@ const Slideshow: React.FC = () => {
 		toggleScroll(false)
 	}
 
-	const onToggleView = (detail) => {
+	const onToggleView = (detail: OnClickTileDetail) => {
 		const e = new CustomEvent('onClickTile', { detail })
 		document.dispatchEvent(e)
 
@@ -116,11 +101,21 @@ const Slideshow: React.FC = () => {
 	}
 
 
+
+	const fragmentShaderObj: { [key: string]: string } = {
+		'shapeShader': shapeShader,
+		'trippyShader': trippyShader,
+		'waveShader': waveShader,
+		'revealShader': revealShader,
+		'gooeyShader': gooeyShader,
+	}
+
+
 	useEffect(() => {
 		scrollbarRef.current = Scrollbar.get(document.querySelector('#scrollarea') as HTMLElement)
 
 		window.addEventListener('resize', () => { onResize() })
-		document.addEventListener('toggleDetail', ({ detail }) => { onToggleView(detail) })
+		document.addEventListener('toggleDetail', (({ detail }: CustomEvent) => onToggleView(detail)) as EventListener)
 
 
 		initScrollbar()
@@ -129,32 +124,16 @@ const Slideshow: React.FC = () => {
 
 		progressWrapperRef.current = document.getElementById('progress-wrapper')
 
-		const images = [
-			'/images/usc-trojan.png',
-			'/images/lemon.jpg',
-			'/images/a-thousand-paths-dark.jpg',
-			'/images/a-thousand-paths-dark.jpg',
-			'/images/a-thousand-paths-dark.jpg',
-		]
 
-		const hoverImages = [
-			'/images/usc-logo.jpg',
-			'/images/day1.jpeg',
-			'/images/clint-mckoy.jpg',
-			'/images/clint-mckoy.jpg',
-			'/images/clint-mckoy.jpg',
-		]
 
-		const fragmentShaders = [
-			trippyShader,
-			shapeShader,
-			gooeyShader,
-			waveShader,
-			revealShader,
-		]
 
-		const tiles = Array.from($tiles).map(($el, i) =>
-			new Tile($el, i, sceneRef.current, images[i], hoverImages[i], fragmentShaders[i])
+		const slides = Array.from($tiles).map(($el, i) => {
+
+			const images =
+				[imagePaths[i], hoverImagePaths[i], shapeImagePaths[i]].filter((path) => path)
+
+			return new Slide($el, sceneRef.current, images, fragmentShaderObj[fragmentShaderNames[i]], vertexShader)
+		}
 		)
 
 		const fov = (180 * (2 * Math.atan(window.innerHeight / 2 / PERSPECTIVE))) / Math.PI;
@@ -190,7 +169,7 @@ const Slideshow: React.FC = () => {
 		const update = () => {
 			requestAnimationFrame(update)
 
-			tiles.forEach((tile) => tile.update())
+			slides.forEach((slide) => slide.update())
 
 			renderer.render(sceneRef.current as Scene, camera as Camera)
 		}
@@ -207,51 +186,17 @@ const Slideshow: React.FC = () => {
 				<ScrollAreaCtn>
 					<ScrollArea id='scrollarea' data-scrollbar className={'scrollarea'} ref={scrollAreaRef}>
 						<SlideShowList>
-							<SlideShowEl data-frame className="slideshow-list__el">
-								<article className="tile | js-tile">
-									<a href="#">
-										<figure className="tile__fig">
-											<img src={blankSVG} alt="Woods & Forests" className="tile__img" />
-										</figure>
-									</a>
-								</article>
-							</SlideShowEl>
-							<SlideShowEl data-frame className="slideshow-list__el">
-								<article className="tile | js-tile">
-									<a href="#">
-										<figure className="tile__fig">
-											<img src={blankSVG} alt="Woods & Forests" className="tile__img" />
-										</figure>
-									</a>
-								</article>
-							</SlideShowEl>
-							<SlideShowEl data-frame className="slideshow-list__el">
-								<article className="tile | js-tile">
-									<a href="#">
-										<figure className="tile__fig">
-											<img src={blankSVG} alt="Woods & Forests" className="tile__img" />
-										</figure>
-									</a>
-								</article>
-							</SlideShowEl>
-							<SlideShowEl data-frame className="slideshow-list__el">
-								<article className="tile | js-tile">
-									<a href="#">
-										<figure className="tile__fig">
-											<img src={blankSVG} alt="Woods & Forests" className="tile__img" />
-										</figure>
-									</a>
-								</article>
-							</SlideShowEl>
-							<SlideShowEl data-frame className="slideshow-list__el">
-								<article className="tile | js-tile">
-									<a href="#">
-										<figure className="tile__fig">
-											<img src={blankSVG} alt="Woods & Forests" className="tile__img" />
-										</figure>
-									</a>
-								</article>
-							</SlideShowEl>
+							{imagePaths?.map((path, i) =>
+								<SlideShowEl data-frame className="slideshow-list__el" key={`frame-${i}`}>
+									<article className="tile | js-tile">
+										<a href="#">
+											<figure className="tile__fig">
+												<img src={blankSVG} alt="Woods & Forests" className="tile__img" />
+											</figure>
+										</a>
+									</article>
+								</SlideShowEl>
+							)}
 						</SlideShowList>
 					</ScrollArea>
 					<SlideshowProgressWrapper id='progress-wrapper'>
@@ -335,18 +280,24 @@ const Wrapper = styled.div`
 const ScrollAreaCtn = styled.section`
 	position: relative;
 	z-index: 9997;
+	width: 100vw;
 `
 
 
 const ScrollArea = styled.div`
 	position: relative;
-	width: 100vw;
+	/* width: 100vw; */
+	width: 100%;
 `
 
 const SlideShowList = styled.ul`
 	display: flex;
 	align-items: center;
 	list-style: none;
+	/* display: block;
+			position: absolute; */
+
+
 `
 
 const SlideShowEl = styled.li`
@@ -354,6 +305,16 @@ const SlideShowEl = styled.li`
 	min-width: 30rem;
 	max-width: 40vmin;
 	margin-right: 20vw;
+position: relative;
+
+
+&:nth-child(2n + 1) {
+	padding-top: 200px;
+}
+
+&:nth-child(2n) {
+	padding-bottom: 200px;
+}
 
 	&:first-child {
 		margin-left: 40vw;
@@ -372,10 +333,10 @@ const SlideShowEl = styled.li`
 		.tile__img {
 			display: block;
 			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
+			top: 100px;
+			left: 100px;
+			/* width: 100%;
+			height: 100%; */
 			object-fit: contain;
 			object-position: center;
 		}
