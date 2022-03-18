@@ -13,6 +13,7 @@ import THREE, {
 	Renderer,
 	LoadingManager,
 	TextureLoader,
+	Texture,
 	WebGLRenderer,
 	BoxBufferGeometry,
 	PlaneBufferGeometry,
@@ -28,20 +29,25 @@ import Scrollbar from 'smooth-scrollbar'
 import { getRatio } from 'utils/three';
 import { Collapse } from '@material-ui/core';
 
-export default class Tile {
+export interface OnClickTileDetail {
+	target: Slide | null;
+	open: boolean;
+}
+
+export default class Slide {
 	scene: Scene;
 	mainImage: any;
-	images: any = [];
+	images: Array<any> = [];
 	sizes: any;
 	offset: any;
-	vertexShader: any;
-	fragmentShader: any;
+	vertexShader: string;
+	fragmentShader: string;
 	clock: any;
 	mouse: any;
 	delta: number = 0;
 	hasClicked: boolean = false;
-	index: number;
-	selectedIndex: number = -1;
+	// index: number;
+	// selectedIndex: number = -1;
 	selected: boolean = false;
 	isZoomed: any = false;
 	loader: any;
@@ -54,12 +60,11 @@ export default class Tile {
 	anchorElement: any;
 	detailView: boolean = false;
 
-	constructor($el: any, index: number, scene: any, image: string, hoverImage: string, fragmentShader: any) {
+	constructor($el: any, scene: any, imagePaths: Array<string | null>, fragmentShader: string, vertexShader: string) {
 		this.scene = scene
-
 		this.anchorElement = $el.querySelector('a')
 		this.mainImage = $el.querySelector('img')
-		// this.images = []
+		this.loader = new TextureLoader()
 		this.sizes = new Vector2(0, 0)
 		this.offset = new Vector2(0, 0)
 
@@ -69,24 +74,19 @@ export default class Tile {
 		this.clock = new Clock()
 		this.mouse = new Vector2(0, 0)
 
-		this.loader = new TextureLoader()
-
-		this.index = index
+		// this.index = index
 		this.bindEvent()
 
-		this.preload([image, hoverImage, '/images/shapes/sung.jpeg'], () => { this.init() })
+		this.preload(imagePaths, () => { this.init() })
 
 	}
 
+
+
 	bindEvent() {
-		document.addEventListener('onClickTile', ({ detail }) => {
-			this.zoom(detail)
-		})
+		document.addEventListener('onClickTile', (({ detail }: CustomEvent) => this.zoom(detail)) as EventListener)
 
-
-		document.addEventListener('onClickClose', () => {
-			this.zoom({ target: null, open: false })
-		})
+		document.addEventListener('onClickClose', () => this.zoom({ target: null, open: false }))
 
 
 		window.addEventListener('mousemove', (e) => { this.onMouseMove(e) })
@@ -134,7 +134,7 @@ export default class Tile {
 		})
 	}
 
-	zoom({ target, open }) {
+	zoom({ target, open }: OnClickTileDetail) {
 
 
 		const shouldZoom = target === this
@@ -142,18 +142,18 @@ export default class Tile {
 		const delay = shouldZoom ? 0.4 : 0
 		const duration = 1.2
 
-		const newScl = {
+		const newScale = {
 			x: shouldZoom ? this.sizes.x * 1.5 : this.sizes.x,
 			// y: shouldZoom ? window.innerHeight - 140 : this.sizes.y,
 			y: shouldZoom ? this.sizes.y * 1.5 : this.sizes.y,
 		}
 
-		const newPos = {
+		const newPosition = {
 			x: shouldZoom ? window.innerWidth / 2 - window.innerWidth * 0.05 - this.sizes.x * 0.95 : this.offset.x,
 			y: shouldZoom ? -20 : this.offset.y,
 		}
 
-		const newRatio = getRatio(newScl, this.images[1].image)
+		const newRatio = getRatio(newScale, this.images[1].image)
 
 
 		this.hide(!shouldZoom, !open)
@@ -181,8 +181,8 @@ export default class Tile {
 		gsap.to(this.mesh.scale, {
 			delay,
 			duration,
-			x: newScl.x,
-			y: newScl.y,
+			x: newScale.x,
+			y: newScale.y,
 			ease: 'expo.inOut',
 			onUpdate: () => { this.getBounds() },
 		})
@@ -191,8 +191,8 @@ export default class Tile {
 		gsap.to(this.mesh.position, {
 			delay,
 			duration,
-			x: newPos.x,
-			y: newPos.y,
+			x: newPosition.x,
+			y: newPosition.y,
 			ease: 'expo.inOut',
 		})
 
@@ -216,14 +216,14 @@ export default class Tile {
 
 	onMouseEnter() {
 		if (!this.mesh) return;
-		this.isHovering = true
 
 		if (this.isZoomed || this.hasClicked) return;
 
 		gsap.to(this.uniforms.u_progressHover, {
 			value: 1,
 			duration: 1,
-			ease: 'power2.inout'
+			ease: 'power2.inout',
+			onUpdate: () => { this.isHovering = true }
 		});
 	}
 
@@ -270,17 +270,17 @@ export default class Tile {
 	}
 
 
-	preload(images: any, allImagesLoadedCallback: any) {
+	preload(imagePaths: Array<string | null>, allImagesLoadedCallback: any) {
 		let loadedCounter = 0
-		const toBeLoadedNumber = images.length
-		const preloadImage = (image: any, anImageLoadedCallback: any) => {
-			const texture = this.loader.load(image, anImageLoadedCallback)
+		const toBeLoadedNumber = imagePaths.length
+		const preloadImage = (imagePath: any, anImageLoadedCallback: any) => {
+			const texture = this.loader.load(imagePath, anImageLoadedCallback)
 			texture.center.set(0.5, 0.5)
 			this.images.push(texture)
 		}
 
-		images.forEach((image: any) => {
-			preloadImage(image, () => {
+		imagePaths.forEach((path: any, i: number) => {
+			preloadImage(path, () => {
 				loadedCounter += 1
 				if (loadedCounter === toBeLoadedNumber) {
 					allImagesLoadedCallback()
@@ -298,11 +298,9 @@ export default class Tile {
 		this.uniforms = {
 			u_alpha: { value: 1 },
 			u_map: { type: 't', value: texture },
-			// u_ratio: { value: getRatio(this.sizes, texture.image) },
-			u_ratio: { value: new Vector2(1, 1) },
+			u_ratio: { value: getRatio(this.sizes, texture.image) },
 			u_hovermap: { type: 't', value: hoverTexture },
-			// u_hoverratio: { value: getRatio(this.sizes, hoverTexture.image) },
-			u_hoverratio: { value: new Vector2(1, 1) },
+			u_hoverratio: { value: getRatio(this.sizes, hoverTexture.image) },
 			u_shape: { value: shape },
 			u_mouse: { value: this.mouse },
 			u_progressHover: { value: .0 },
@@ -315,7 +313,7 @@ export default class Tile {
 
 		const material = new ShaderMaterial({
 			uniforms: this.uniforms,
-			vertexShader: vertexShader,
+			vertexShader: this.vertexShader,
 			fragmentShader: this.fragmentShader,
 			transparent: true,
 			defines: {
