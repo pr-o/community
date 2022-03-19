@@ -20,20 +20,6 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, any>(function Canvas(
 	)
 })
 
-
-
-const StyledDiv = styled.div`
-	display: flex;
-	position: absolute;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: 100%;
-	z-index: 20;
-	overflow: hidden;
-	border: 3px solid blue;
-`
-
 const StyledCanvas = styled.canvas`
 	position: fixed;
 	left: 0;
@@ -43,5 +29,4 @@ const StyledCanvas = styled.canvas`
 	width: 100%;
 	height: 100%;
 	z-index: 999;
-	border: 1px solid blue;
 `
