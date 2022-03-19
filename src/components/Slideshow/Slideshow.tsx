@@ -101,7 +101,6 @@ const Slideshow: FC = () => {
 	}
 
 
-
 	const fragmentShaderObj: { [key: string]: string } = {
 		'shapeShader': shapeShader,
 		'trippyShader': trippyShader,
