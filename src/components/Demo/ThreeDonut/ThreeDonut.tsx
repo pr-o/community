@@ -40,7 +40,7 @@ const ThreeDonut = () => {
 			alpha: true,
 		});
 		renderer.setSize(window.innerWidth, window.innerHeight);
-		canvasRef.current?.appendChild(renderer.domElement);
+		renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 		const geometry = new THREE.TorusGeometry(
 			parameters.radius,
@@ -129,10 +129,7 @@ const ThreeDonut = () => {
 
 		animate();
 
-		return () => {
-			canvasRef.current?.removeChild(renderer.domElement);
-			subscription.unsubscribe();
-		}
+		return () => { subscription.unsubscribe() }
 	}, []);
 
 	return (
@@ -153,5 +150,5 @@ const Wrapper = styled.div`
 	align-items: center;
 	justify-content: center;
 	z-index: 9;
-	background-color: #525252;
+	background-color: #000;
 `
