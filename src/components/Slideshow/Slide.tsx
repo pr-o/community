@@ -345,13 +345,6 @@ export default class Slide {
 
 	init() {
 
-		// this.stgs = new ST(this.$els.text, { type: 'lines', linesClass: 'line' })
-
-		// this.stgs.lines.forEach((l) => {
-		// 	const div = document.createElement('div')
-		// 	div.classList.add('line-ctn')
-		// 	wrap(l, div)
-		// })
 
 		const [texture, hoverTexture, shape] = this.images
 
