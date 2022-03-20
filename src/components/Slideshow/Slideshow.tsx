@@ -23,7 +23,7 @@ import revealShader from 'lib/glsl/revealShader.glsl';
 import gooeyShader from 'lib/glsl/gooeyShader.glsl';
 import HorizontalScrollPlugin from 'lib/utils/HorizontalScrollPlugin'
 import Scrollbar from 'smooth-scrollbar'
-import { imagePaths, hoverImagePaths, fragmentShaderNames, shapeImagePaths } from 'components/Slideshow/imagePaths'
+import { imagePaths, hoverImagePaths, fragmentShaderNames, shapeImagePaths, titles, texts } from 'components/Slideshow/imagePaths'
 
 import Slide, { OnClickTileDetail } from 'components/Slideshow/Slide'
 import FastRewind from 'components/assets/FastRewind'
@@ -85,17 +85,8 @@ const Slideshow: FC = () => {
 			})
 		});
 
-		// backButtonRef?.current?.style.display = lock ? 'block' : 'block';
+		(backButtonRef?.current as HTMLDivElement)?.classList?.toggle('is-open', lock)
 
-		(backButtonRef?.current as HTMLDivElement).classList.toggle('is-open', !lock)
-
-
-		gsap.to(backButtonRef.current, {
-			delay: 0.3,
-			duration: 1,
-			alpha: lock ? 1 : 0,
-			force3D: true,
-		})
 
 
 	}
@@ -106,12 +97,6 @@ const Slideshow: FC = () => {
 
 		toggleScroll(false)
 
-		// gsap.to(backButtonRef.current, {
-		// 	delay: 0.3,
-		// 	duration: 1,
-		// 	alpha: 0,
-		// 	force3D: true,
-		// })
 	}
 
 	const onToggleView = (detail: OnClickTileDetail) => {
@@ -136,6 +121,7 @@ const Slideshow: FC = () => {
 
 
 	useEffect(() => {
+
 		scrollbarRef.current = Scrollbar.get(document.querySelector('#scrollarea') as HTMLElement)
 
 		window.addEventListener('resize', () => { onResize() })
@@ -144,14 +130,13 @@ const Slideshow: FC = () => {
 
 		initScrollbar()
 		sceneRef.current = new Scene();
-		const $tiles = document.querySelectorAll('.slideshow-list__el')
 
 		progressWrapperRef.current = document.getElementById('progress-wrapper')
 
 
+		const $slideEls = document.querySelectorAll('.slide')
 
-
-		const slides = Array.from($tiles).map(($el, i) => {
+		const slides = Array.from($slideEls).map(($el, i) => {
 
 			const images =
 				[imagePaths[i], hoverImagePaths[i], shapeImagePaths[i]].filter((path) => path)
@@ -211,14 +196,23 @@ const Slideshow: FC = () => {
 					<ScrollArea id='scrollarea' data-scrollbar className={'scrollarea'} ref={scrollAreaRef}>
 						<SlideShowList>
 							{imagePaths?.map((path, i) =>
-								<SlideShowEl data-frame className="slideshow-list__el" key={`frame-${i}`}>
-									<article className="tile | js-tile">
+								<SlideShowEl className={`slide`} key={`frame-${i}`}>
+									<article>
 										<a href="#">
-											<figure className="tile__fig">
-												<img src={blankSVG} alt="Woods & Forests" className="tile__img" />
+											<figure>
+												<img src={blankSVG} alt="" />
 											</figure>
+
 										</a>
 									</article>
+									<Details>
+										<div>
+											<h2>{titles[i]}</h2>
+										</div>
+										<div>
+											<h3>{texts[i]}</h3>
+										</div>
+									</Details>
 								</SlideShowEl>
 							)}
 						</SlideShowList>
@@ -249,12 +243,16 @@ const Aside = styled.aside`
 	top: 0;
 	left: 0;
 	z-index: 99999;
+	transition: opacity 10s ease-in-out;
 
 	opacity: 0
+	cursor: default;
 	pointer-events: none;
+
 	& .is-open {
 		opacity: 1;
-		pointer-events: none;
+		cursor: pointer;
+		pointer-events: auto;
 	}
 
 	@keyframes pulse {
@@ -329,15 +327,19 @@ const SlideShowEl = styled.li`
 position: relative;
 
 
-&:nth-child(2n + 1) {
+&:nth-of-type(2n + 1) {
 	padding-top: 200px;
 }
 
-&:nth-child(2n) {
+&:nth-of-type(2n) {
 	padding-bottom: 200px;
 }
 
-	&:first-child {
+	/* &:first-child {
+		margin-left: 40vw;
+		box-sizing: content-box;
+	} */
+	&:first-of-type {
 		margin-left: 40vw;
 		box-sizing: content-box;
 	}
@@ -385,4 +387,21 @@ const SlideshowProgress = styled.span<{ progress: number }>`
 	border-radius: .5rem;
 	transition: transform .1s;
 	transform: ${({ progress }) => `translateX(${-100 + progress}%)`};
+`
+
+const Details = styled.div`
+	position: fixed;
+	bottom: 50%;
+	left: 10%;
+	width: 50%;
+	height: 50%;
+	font-size: 1.25rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	border: 1px solid red;
+	pointer-events: none;
+	border: 2px solid purple;
+	z-index: 9999;
+	opacity: 0;
 `

@@ -50,3 +50,17 @@ export const shapeImagePaths = [
 	null,
 	null,
 ].map((path) => (path ? `${SHAPE_IMAGES_DIR}/${path}` : null));
+
+export const titles = [
+	'title',
+	'title',
+	'title',
+	'title',
+	'title',
+	'title',
+	'title',
+	'title',
+	'title',
+];
+
+export const texts = ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text'];
