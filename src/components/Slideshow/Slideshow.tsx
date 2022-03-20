@@ -77,13 +77,27 @@ const Slideshow: FC = () => {
 		const delay = lock ? 0 : 1
 		const alpha = lock ? 0 : 1
 
-		gsap.to(progressWrapperRef.current, { delay, duration, alpha, force3D: true })
+		gsap.to(progressWrapperRef.current, { delay, duration, alpha, force3D: true });
 
 		gsap.delayedCall(duration, () => {
 			scrollbarRef.current?.updatePluginOptions('horizontalScroll', {
 				events: lock ? false : [/wheel/],
 			})
+		});
+
+		// backButtonRef?.current?.style.display = lock ? 'block' : 'block';
+
+		(backButtonRef?.current as HTMLDivElement).classList.toggle('is-open', !lock)
+
+
+		gsap.to(backButtonRef.current, {
+			delay: 0.3,
+			duration: 1,
+			alpha: lock ? 1 : 0,
+			force3D: true,
 		})
+
+
 	}
 
 	const onClickClose = () => {
@@ -91,6 +105,13 @@ const Slideshow: FC = () => {
 		document.dispatchEvent(e)
 
 		toggleScroll(false)
+
+		// gsap.to(backButtonRef.current, {
+		// 	delay: 0.3,
+		// 	duration: 1,
+		// 	alpha: 0,
+		// 	force3D: true,
+		// })
 	}
 
 	const onToggleView = (detail: OnClickTileDetail) => {
@@ -98,6 +119,10 @@ const Slideshow: FC = () => {
 		document.dispatchEvent(e)
 
 		toggleScroll(detail.open)
+
+		console.log('detail.open', detail.open)
+
+
 	}
 
 
@@ -220,11 +245,17 @@ const Slideshow: FC = () => {
 export default Slideshow;
 
 const Aside = styled.aside`
-	border: 2px solid red;
 	position: absolute;
 	top: 0;
 	left: 0;
 	z-index: 99999;
+
+	opacity: 0
+	pointer-events: none;
+	& .is-open {
+		opacity: 1;
+		pointer-events: none;
+	}
 
 	@keyframes pulse {
 		  0% { fill: #002020; transform: scale(0.8); }
@@ -241,8 +272,9 @@ const BackButtonWrapper = styled.div`
 	display: block;
 	width: 100%;
 	height: 100%;
-	padding: 3vw;
+	padding: 4vw;
 	color: #fff;
+	opacity: 0;
 
 	button {
 		position: relative;
@@ -263,17 +295,7 @@ const Wrapper = styled.div`
 	justify-content: center;
 	z-index: 9998;
 
-	.detail-view {
-    overflow: auto;
-    position: fixed;
-    z-index: 90009999;
-    top: 0;
-    left: 0;
-    width: 100%;
-    min-height: 100vh;
-		border: 1px solid red;
-    opacity: 0;
-	}
+
 `
 
 const ScrollAreaCtn = styled.section`
