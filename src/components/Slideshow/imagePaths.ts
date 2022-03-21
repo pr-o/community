@@ -52,15 +52,27 @@ export const shapeImagePaths = [
 ].map((path) => (path ? `${SHAPE_IMAGES_DIR}/${path}` : null));
 
 export const titles = [
-	'title1',
-	'title2',
-	'title3',
-	'title4',
-	'title5',
-	'title',
-	'title',
-	'title',
-	'title',
+	'Full Stack Engineer',
+	'AI Research Consultant',
+	'Software Engineer',
+	'Research Assistant',
+	'Software Engineer',
+	'Speech Solutions Researcher',
+	'Instructor (Winter Shool)',
+	'English Tutor',
+	'English Tutor',
 ];
 
-export const texts = ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text'];
+export const subtitles = [
+	'@ Lemonade - Day1Company',
+	'@ StepIntoCity + SK AI College',
+	'@ CNUH - Smart Healthcare VR/AR TF',
+	'@ USC',
+	"@ Doctor's Fab",
+	'@ MediaZen',
+	'@ Korea University',
+	'LoL pro teams - 100 Thieves, Optic Gaming, Echo Fox',
+	'Overwatch pro teams - Outlaws, Charge, Shock',
+];
+
+export const texts = ['', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text'];
