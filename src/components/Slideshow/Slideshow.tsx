@@ -205,7 +205,7 @@ const Slideshow: FC = () => {
 
 										</a>
 									</article>
-									<Details>
+									<Details id={'details'}>
 										<div>
 											<h2>{titles[i]}</h2>
 										</div>
@@ -396,6 +396,7 @@ const Details = styled.div`
 	width: 50%;
 	height: 50%;
 	font-size: 1.25rem;
+	color: white;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;

@@ -38,6 +38,7 @@ export default class Slide {
 	scene: Scene;
 	anchorElement: HTMLAnchorElement;
 	mainImage: HTMLImageElement;
+	detailsElement: HTMLDivElement;
 	title: HTMLHeadingElement;
 	text: HTMLSpanElement;
 	images: Array<Texture> = [];
@@ -67,6 +68,7 @@ export default class Slide {
 		this.anchorElement = $el.querySelector('a')
 		this.mainImage = $el.querySelector('img')
 		// this.title = $el.querySelector('h2')
+		this.detailsElement = $el.querySelector('#details')
 		this.title = $el.querySelector('h2')
 		this.text = $el.querySelector('h3')
 		this.loader = new TextureLoader()
@@ -214,19 +216,28 @@ export default class Slide {
 		// 		force3D: true,
 		// stagger: 0.25
 		// }, 0.255 / this.stgs.lines.length)
-		this.staggerTexts()
+
+
+		// this.staggerTexts(shouldZoom)
 	}
 
 
-	staggerTexts() {
+	staggerTexts(shouldZoom: boolean) {
+
+		if (!shouldZoom) return;
 
 		const duration = 0.5
 		const stagger = 0.005
 
 		const timeline1 = gsap.timeline()
 		const timeline2 = gsap.timeline()
+		const timeline3 = gsap.timeline()
+
+		timeline3
+
 
 		timeline1
+			.set(this.detailsElement, { opacity: 1 })
 			.set(this.title, { opacity: 0 })
 			.to(this.title, {
 				duration: 2,
@@ -344,7 +355,6 @@ export default class Slide {
 	}
 
 	init() {
-
 
 		const [texture, hoverTexture, shape] = this.images
 

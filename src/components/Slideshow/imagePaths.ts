@@ -52,11 +52,11 @@ export const shapeImagePaths = [
 ].map((path) => (path ? `${SHAPE_IMAGES_DIR}/${path}` : null));
 
 export const titles = [
-	'title',
-	'title',
-	'title',
-	'title',
-	'title',
+	'title1',
+	'title2',
+	'title3',
+	'title4',
+	'title5',
 	'title',
 	'title',
 	'title',

@@ -4,6 +4,9 @@ import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { RootState } from 'lib/redux/modules';
 import { setTheme, Theme } from 'lib/redux/modules/theme';
 import styled from '@emotion/styled';
+import useCheckMobile from 'lib/hooks/useCheckMobile';
+// import HeaderLinks from 'components/Header/HeaderLinks';
+import Nav from 'components/Header/HeaderLinks';
 
 import {
 	Menu as MenuIcon,
@@ -37,8 +40,10 @@ const BRAND = 'Community'
 
 const Header = ({ fixed, color, changeColorOnScroll }: Props) => {
 
+	const isMobile = useCheckMobile();
 	const [headerColor, setHeaderColor] = useState(color);
 	const [padding, setPadding] = useState('1.5rem');
+	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	useEffect(() => {
 		if (!changeColorOnScroll) return;
@@ -58,17 +63,11 @@ const Header = ({ fixed, color, changeColorOnScroll }: Props) => {
 		}
 	}
 
-	const dispatch = useDispatch();
 
 	const { theme } = useSelector(
 		(state: RootState) => ({ theme: state.theme }), shallowEqual
 	);
 
-	const toggleTheme = () => {
-		theme.theme === Theme.light
-			? dispatch(setTheme(Theme.dark)) && document.body.classList.replace('light', 'dark')
-			: dispatch(setTheme(Theme.light)) && document.body.classList.replace('dark', 'light')
-	}
 
 	return (
 		<StyledHeader color={headerColor} padding={padding}>
@@ -78,9 +77,6 @@ const Header = ({ fixed, color, changeColorOnScroll }: Props) => {
 						{BRAND}
 					</Link>
 				</Brand>
-				<HamburgerMenu>
-					<MenuIcon />
-				</HamburgerMenu>
 			</Left>
 			<Center>
 				{/*
@@ -88,49 +84,20 @@ const Header = ({ fixed, color, changeColorOnScroll }: Props) => {
 				*/}
 			</Center>
 			<Right>
-				<Menus>
-					<nav>
-						<ul>
-							<li>
-								<Link href="/demo" passHref>
-									<Menu>
-										<ThreeDRotationIcon />
-										<a>Three</a>
-									</Menu>
-								</Link>
-							</li>
-							<li>
-								<Link href="/about" passHref>
-									<Menu>
-										<ViewCarouselIcon />
-										<a>About</a>
-									</Menu>
-								</Link>
-							</li>
-							<li>
-								<Link href="/github/whoisbusy" passHref>
-									<Menu>
-										<GitHubIcon />
-									</Menu>
-								</Link>
-							</li>
-							<li>
-								<Menu onClick={() => toggleTheme()}>
-									{
-										theme.theme === 'light'
-											? <LightThemeIcon />
-											: <DarkThemeIcon />
-									}
-								</Menu>
-							</li>
-							<li>
-								<Menu>
-									<AccountCircleIcon />
-								</Menu>
-							</li>
-						</ul>
-					</nav>
-				</Menus>
+				<Nav />
+				{/* {isMobile
+					? (
+						<MobileMenu >
+							<MenuIcon onClick={() => setMobileMenuOpen(!mobileMenuOpen)} />
+							<HeaderLinks mobileMenuOpen={mobileMenuOpen} />
+						</MobileMenu>
+					)
+					: (
+						<Menus>
+							<HeaderLinks />
+						</Menus>
+					)
+				} */}
 			</Right>
 		</StyledHeader>
 	)
@@ -185,7 +152,7 @@ const Brand = styled.div`
 	}
 `;
 
-const HamburgerMenu = styled.div`
+const MobileMenu = styled.div`
 	display: none;
 	align-items: center;
 	line-height: 2rem;
@@ -200,22 +167,3 @@ const Menus = styled.div`
 		display: none;
 	}
 `
-
-const Menu = styled.div`
-	display: flex;
-	align-items: center;
-	height: 2rem;
-	margin: 0 .5rem 0 .75rem;
-	font-size: .875rem;
-	color: #fff;
-	cursor: pointer;
-	a {
-		padding: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	svg + a {
-		margin-left: 0.375rem;
-	}
-`;
