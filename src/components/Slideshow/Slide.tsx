@@ -149,12 +149,12 @@ export default class Slide {
 		const duration = 1.2
 
 		const newScale = {
-			x: shouldZoom ? window.innerWidth * 0.5 : this.sizes.x,
-			y: shouldZoom ? window.innerHeight - 135 : this.sizes.y,
+			x: shouldZoom ? window.innerWidth * 0.45 : this.sizes.x,
+			y: shouldZoom ? window.innerHeight - 145 : this.sizes.y,
 		}
 
 		const newPosition = {
-			x: shouldZoom ? window.innerWidth / 2 - window.innerWidth * 0.025 - this.sizes.x * 0.925 : this.offset.x,
+			x: shouldZoom ? window.innerWidth / 2 - window.innerWidth * 0.05 - this.sizes.x * 0.95 : this.offset.x,
 			y: shouldZoom ? -20 : this.offset.y,
 		}
 
