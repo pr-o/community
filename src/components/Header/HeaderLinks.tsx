@@ -87,7 +87,7 @@ const HeaderLinks = () => {
 					</Link>
 				</li>
 				<li>
-					<Menu onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+					<Menu onClick={() => toggleTheme()}>
 						{
 							theme.theme === 'light'
 								? <LightThemeIcon />
