@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, Fragment, FC } from 'react';
+import React, { useEffect, useState, useRef, Fragment, FC, AnchorHTMLAttributes } from 'react';
 import { gsap } from 'gsap';
 
 import styled from '@emotion/styled';
@@ -36,8 +36,12 @@ export interface OnClickTileDetail {
 
 export default class Slide {
 	scene: Scene;
-	mainImage: any;
-	images: Array<any> = [];
+	anchorElement: HTMLAnchorElement;
+	mainImage: HTMLImageElement;
+	detailsElement: HTMLDivElement;
+	title: HTMLHeadingElement;
+	text: HTMLSpanElement;
+	images: Array<Texture> = [];
 	sizes: any;
 	offset: any;
 	vertexShader: string;
@@ -57,13 +61,16 @@ export default class Slide {
 	scrollbar: any;
 	prevScroll: number = 0;
 	isHovering: boolean = false;
-	anchorElement: any;
 	detailView: boolean = false;
 
 	constructor($el: any, scene: any, imagePaths: Array<string | null>, fragmentShader: string, vertexShader: string) {
 		this.scene = scene
 		this.anchorElement = $el.querySelector('a')
 		this.mainImage = $el.querySelector('img')
+		// this.title = $el.querySelector('h2')
+		this.detailsElement = $el.querySelector('#details')
+		this.title = $el.querySelector('h2')
+		this.text = $el.querySelector('h3')
 		this.loader = new TextureLoader()
 		this.sizes = new Vector2(0, 0)
 		this.offset = new Vector2(0, 0)
@@ -74,7 +81,6 @@ export default class Slide {
 		this.clock = new Clock()
 		this.mouse = new Vector2(0, 0)
 
-		// this.index = index
 		this.bindEvent()
 
 		this.preload(imagePaths, () => { this.init() })
@@ -143,13 +149,12 @@ export default class Slide {
 		const duration = 1.2
 
 		const newScale = {
-			x: shouldZoom ? this.sizes.x * 1.5 : this.sizes.x,
-			// y: shouldZoom ? window.innerHeight - 140 : this.sizes.y,
-			y: shouldZoom ? this.sizes.y * 1.5 : this.sizes.y,
+			x: shouldZoom ? window.innerWidth * 0.5 : this.sizes.x,
+			y: shouldZoom ? window.innerHeight - 135 : this.sizes.y,
 		}
 
 		const newPosition = {
-			x: shouldZoom ? window.innerWidth / 2 - window.innerWidth * 0.05 - this.sizes.x * 0.95 : this.offset.x,
+			x: shouldZoom ? window.innerWidth / 2 - window.innerWidth * 0.025 - this.sizes.x * 0.925 : this.offset.x,
 			y: shouldZoom ? -20 : this.offset.y,
 		}
 
@@ -211,6 +216,66 @@ export default class Slide {
 		// 		force3D: true,
 		// stagger: 0.25
 		// }, 0.255 / this.stgs.lines.length)
+
+
+		// this.staggerTexts(shouldZoom)
+	}
+
+
+	staggerTexts(shouldZoom: boolean) {
+
+		if (!shouldZoom) return;
+
+		const duration = 0.5
+		const stagger = 0.005
+
+		const timeline1 = gsap.timeline()
+		const timeline2 = gsap.timeline()
+		const timeline3 = gsap.timeline()
+
+		timeline3
+
+
+		timeline1
+			.set(this.detailsElement, { opacity: 1 })
+			.set(this.title, { opacity: 0 })
+			.to(this.title, {
+				duration: 2,
+				stagger,
+				opacity: 1,
+				y: '-400%',
+				ease: 'power3.easeInOut',
+			})
+
+		timeline2
+			.set(this.text, { opacity: 0 })
+			.to(this.text, {
+				duration: 2,
+				// stagger,
+				opacity: 1,
+				y: '-200%',
+				ease: 'power3.easeInOut',
+			})
+
+		console.log('title', this.title)
+		console.log('span', this.text)
+		// .to(this.title, {
+		// 	duration,
+		// 	stagger,
+		// 	opacity: 0.6,
+		// 	y: '-=100%',
+		// 	force3D: true,
+		// 	ease: 'power3.easeOut',
+		// })
+		// .to(this.title, {
+		// 	duration,
+		// 	opacity: 1,
+		// 	y: '-=100%',
+		// 	force3D: true,
+		// 	ease: 'power3.easeOut',
+		// })
+
+
 	}
 
 
