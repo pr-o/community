@@ -22,12 +22,15 @@ import THREE, {
 	MeshBasicMaterial,
 	ShaderMaterial,
 	Mesh,
+	MeshPhongMaterial,
 	Vector2, Object3D,
 } from 'three';
 import vertexShader from 'lib/glsl/vertexShader.glsl';
 import Scrollbar from 'smooth-scrollbar'
 import { getRatio } from 'utils/three';
 import { Collapse } from '@material-ui/core';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 export interface OnClickTileDetail {
 	target: Slide | null;
@@ -39,7 +42,8 @@ export default class Slide {
 	anchorElement: HTMLAnchorElement;
 	mainImage: HTMLImageElement;
 	detailsElement: HTMLDivElement;
-	title: HTMLHeadingElement;
+	title: string;
+	subtitle: string;
 	text: HTMLSpanElement;
 	images: Array<Texture> = [];
 	sizes: any;
@@ -62,15 +66,20 @@ export default class Slide {
 	prevScroll: number = 0;
 	isHovering: boolean = false;
 	detailView: boolean = false;
+	font: any;
+	titleMesh: any;
+	subtitleMesh: any;
 
-	constructor($el: any, scene: any, imagePaths: Array<string | null>, fragmentShader: string, vertexShader: string) {
+	constructor($el: any, scene: any, imagePaths: Array<string | null>, fragmentShader: string, vertexShader: string, title: string, subtitle: string) {
 		this.scene = scene
 		this.anchorElement = $el.querySelector('a')
 		this.mainImage = $el.querySelector('img')
-		// this.title = $el.querySelector('h2')
+		this.title = title
+		this.subtitle = subtitle
 		this.detailsElement = $el.querySelector('#details')
-		this.title = $el.querySelector('h2')
-		this.text = $el.querySelector('h3')
+		// this.title = $el.querySelector('h2')
+		// this.subtitle = $el.querySelector('h3')
+		this.text = $el.querySelector('h4')
 		this.loader = new TextureLoader()
 		this.sizes = new Vector2(0, 0)
 		this.offset = new Vector2(0, 0)
@@ -84,9 +93,77 @@ export default class Slide {
 		this.bindEvent()
 
 		this.preload(imagePaths, () => { this.init() })
-
+		// this.font = null;
 	}
 
+
+	createText() {
+		const fontLoader = new FontLoader();
+
+		const size = 70
+		const height = 20
+		const curveSegments = 4;
+		const bevelThickness = 2
+		const bevelSize = 1.5;
+		const bevelEnabled = true;
+
+		const materials = [
+			new MeshPhongMaterial({ color: 0x004040, flatShading: true }), // front
+			new MeshPhongMaterial({ color: 0x002020 }) // side
+		];
+
+
+		fontLoader.load('/fonts/optimer_bold.typeface.json',
+			(font) => {
+				const titleGeometry = new TextGeometry(this.title, {
+					font,
+					size: 60,
+					height,
+					curveSegments,
+					bevelThickness,
+					bevelSize,
+					bevelEnabled,
+				});
+
+				const titleMesh = new Mesh(titleGeometry, materials);
+
+				titleMesh.position.x = -window.innerWidth * .45;
+				titleMesh.position.y = window.innerHeight * .05;
+				titleMesh.position.z = 1;
+
+				titleMesh.rotation.x = 0;
+				titleMesh.rotation.y = 0; //Math.PI * 2.2;
+
+				titleMesh.visible = false
+				this.titleMesh = titleMesh
+				this.scene.add(titleMesh)
+
+				const subtitleGeometry = new TextGeometry(this.subtitle, {
+					font,
+					size: 30,
+					height,
+					curveSegments,
+					bevelThickness,
+					bevelSize,
+					bevelEnabled,
+				});
+				const subtitleMesh = new Mesh(subtitleGeometry, materials);
+
+				subtitleMesh.position.x = -window.innerWidth * .40;
+				subtitleMesh.position.y = window.innerHeight * -0.05;
+				subtitleMesh.position.z = 1;
+
+				subtitleMesh.rotation.x = 0;
+				subtitleMesh.rotation.y = Math.PI * 4;
+
+				subtitleMesh.visible = false
+				this.subtitleMesh = subtitleMesh
+				this.scene.add(subtitleMesh)
+			});
+
+
+
+	}
 
 
 	bindEvent() {
@@ -138,6 +215,8 @@ export default class Slide {
 			alpha: shouldHide && !open ? 0 : 1,
 			force3D: true,
 		})
+
+
 	}
 
 	zoom({ target, open }: OnClickTileDetail) {
@@ -149,8 +228,8 @@ export default class Slide {
 		const duration = 1.2
 
 		const newScale = {
-			x: shouldZoom ? window.innerWidth * 0.45 : this.sizes.x,
-			y: shouldZoom ? window.innerHeight - 145 : this.sizes.y,
+			x: shouldZoom ? window.innerWidth * 0.5 : this.sizes.x,
+			y: shouldZoom ? window.innerHeight - 150 : this.sizes.y,
 		}
 
 		const newPosition = {
@@ -162,6 +241,13 @@ export default class Slide {
 
 
 		this.hide(!shouldZoom, !open)
+
+
+		setTimeout(() => {
+			this.titleMesh.visible = shouldZoom ? true : false
+			this.subtitleMesh.visible = shouldZoom ? true : false
+		}, shouldZoom ? 1000 : 500)
+
 
 
 		gsap.to(this.uniforms.u_progressClick, {
@@ -209,74 +295,15 @@ export default class Slide {
 			ease: 'expo.inOut',
 		})
 
-		// gsap.to(this.stgs.lines, {
-		//    duration,
-		// 		yPercent: shouldZoom ? 100 : 0,
-		// 		ease: expo.InOut,
-		// 		force3D: true,
-		// stagger: 0.25
-		// }, 0.255 / this.stgs.lines.length)
 
 
-		// this.staggerTexts(shouldZoom)
-	}
 
 
-	staggerTexts(shouldZoom: boolean) {
-
-		if (!shouldZoom) return;
-
-		const duration = 0.5
-		const stagger = 0.005
-
-		const timeline1 = gsap.timeline()
-		const timeline2 = gsap.timeline()
-		const timeline3 = gsap.timeline()
-
-		timeline3
-
-
-		timeline1
-			.set(this.detailsElement, { opacity: 1 })
-			.set(this.title, { opacity: 0 })
-			.to(this.title, {
-				duration: 2,
-				stagger,
-				opacity: 1,
-				y: '-400%',
-				ease: 'power3.easeInOut',
-			})
-
-		timeline2
-			.set(this.text, { opacity: 0 })
-			.to(this.text, {
-				duration: 2,
-				// stagger,
-				opacity: 1,
-				y: '-200%',
-				ease: 'power3.easeInOut',
-			})
-
-		console.log('title', this.title)
-		console.log('span', this.text)
-		// .to(this.title, {
-		// 	duration,
-		// 	stagger,
-		// 	opacity: 0.6,
-		// 	y: '-=100%',
-		// 	force3D: true,
-		// 	ease: 'power3.easeOut',
-		// })
-		// .to(this.title, {
-		// 	duration,
-		// 	opacity: 1,
-		// 	y: '-=100%',
-		// 	force3D: true,
-		// 	ease: 'power3.easeOut',
-		// })
 
 
 	}
+
+
 
 
 	onMouseEnter() {
@@ -355,6 +382,7 @@ export default class Slide {
 	}
 
 	init() {
+		this.createText()
 
 		const [texture, hoverTexture, shape] = this.images
 
@@ -395,6 +423,7 @@ export default class Slide {
 		this.mesh.scale.set(this.sizes.x, this.sizes.y, 1)
 
 		this.scene.add(this.mesh);
+
 	}
 
 	onResize() {

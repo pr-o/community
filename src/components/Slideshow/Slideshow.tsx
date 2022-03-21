@@ -23,7 +23,7 @@ import revealShader from 'lib/glsl/revealShader.glsl';
 import gooeyShader from 'lib/glsl/gooeyShader.glsl';
 import HorizontalScrollPlugin from 'lib/utils/HorizontalScrollPlugin'
 import Scrollbar from 'smooth-scrollbar'
-import { imagePaths, hoverImagePaths, fragmentShaderNames, shapeImagePaths, titles, texts } from 'components/Slideshow/imagePaths'
+import { imagePaths, hoverImagePaths, fragmentShaderNames, shapeImagePaths, titles, subtitles, texts } from 'components/Slideshow/imagePaths'
 
 import Slide, { OnClickTileDetail } from 'components/Slideshow/Slide'
 import FastRewind from 'components/assets/FastRewind'
@@ -86,9 +86,6 @@ const Slideshow: FC = () => {
 		});
 
 		(backButtonRef?.current as HTMLDivElement)?.classList?.toggle('is-open', lock)
-
-
-
 	}
 
 	const onClickClose = () => {
@@ -141,7 +138,7 @@ const Slideshow: FC = () => {
 			const images =
 				[imagePaths[i], hoverImagePaths[i], shapeImagePaths[i]].filter((path) => path)
 
-			return new Slide($el, sceneRef.current, images, fragmentShaderObj[fragmentShaderNames[i]], vertexShader)
+			return new Slide($el, sceneRef.current, images, fragmentShaderObj[fragmentShaderNames[i]], vertexShader, titles[i], subtitles[i])
 		}
 		)
 
@@ -202,17 +199,8 @@ const Slideshow: FC = () => {
 											<figure>
 												<img src={blankSVG} alt="" />
 											</figure>
-
 										</a>
 									</article>
-									<Details id={'details'}>
-										<div>
-											<h2>{titles[i]}</h2>
-										</div>
-										<div>
-											<h3>{texts[i]}</h3>
-										</div>
-									</Details>
 								</SlideShowEl>
 							)}
 						</SlideShowList>
@@ -323,7 +311,7 @@ const SlideShowEl = styled.li`
 	width: 100%;
 	min-width: 30rem;
 	max-width: 40vmin;
-	margin-right: 20vw;
+	margin-right: 30vw;
 position: relative;
 
 
@@ -335,34 +323,21 @@ position: relative;
 	padding-bottom: 200px;
 }
 
-	/* &:first-child {
-		margin-left: 40vw;
-		box-sizing: content-box;
-	} */
+
 	&:first-of-type {
-		margin-left: 40vw;
-		box-sizing: content-box;
+		margin-left: 30vw;
 	}
 
-	&:last-child {
-		padding-right: 10vw;
-		box-sizing: content-box;
+	&:last-of-type {
+		margin-right: 50vw;
 	}
 
 	img {
+		margin-right: 50vw;
 		width: 500px;
 		height: 500px;
-
-		.tile__img {
-			display: block;
-			position: absolute;
-			top: 100px;
-			left: 100px;
-			/* width: 100%;
-			height: 100%; */
-			object-fit: contain;
-			object-position: center;
-		}
+		object-fit: contain;
+		object-position: center;
 	}
 `
 
@@ -387,22 +362,4 @@ const SlideshowProgress = styled.span<{ progress: number }>`
 	border-radius: .5rem;
 	transition: transform .1s;
 	transform: ${({ progress }) => `translateX(${-100 + progress}%)`};
-`
-
-const Details = styled.div`
-	position: fixed;
-	bottom: 50%;
-	left: 10%;
-	width: 50%;
-	height: 50%;
-	font-size: 1.25rem;
-	color: white;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	border: 1px solid red;
-	pointer-events: none;
-	border: 2px solid purple;
-	z-index: 9999;
-	opacity: 0;
 `
