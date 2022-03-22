@@ -49,7 +49,6 @@ const ThreeDonut = () => {
 			sudoHeadMesh.position.set(0.68, 0.33, -0.67)
 			sudoHeadMesh.rotation.set(Math.PI / 2, 0, 0.29)
 			group.add(sudoHeadMesh)
-			console.log('sudoHeadMesh', sudoHeadMesh)
 
 			// Floor
 			let floorMesh = new THREE.Mesh(c.Level.geometry, c.Level.material)

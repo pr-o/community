@@ -1,20 +1,17 @@
 import React, { useEffect, useState, useRef, FC } from 'react';
 import { gsap } from 'gsap';
-import { fromEvent, of } from 'rxjs'; // fromEvent 를 통해 화살표 이용한 navigation ㄱㄱ
-import { throttle, distinctUntilKeyChanged, filter, pluck } from 'rxjs/operators';
-
+// TODO: fromEvent 를 통해 화살표 이용한 navigation
+// import { fromEvent, of } from 'rxjs';
+// import { throttle, distinctUntilKeyChanged, filter, pluck } from 'rxjs/operators';
 import styled from '@emotion/styled';
-
 import {
 	Scene,
 	Camera,
 	PerspectiveCamera,
 	AmbientLight,
 	WebGLRenderer,
-	BoxBufferGeometry,
 } from 'three';
 import { Canvas } from 'lib/hooks/Canvas'
-
 import vertexShader from 'lib/glsl/vertexShader.glsl';
 import shapeShader from 'lib/glsl/shapeShader.glsl';
 import trippyShader from 'lib/glsl/trippyShader.glsl';
@@ -38,7 +35,6 @@ interface ScrollEvent extends Event {
 }
 
 const Slideshow: FC = () => {
-
 	const [progress, setProgress] = useState<number>(0)
 	const progressWrapperRef = useRef<HTMLElement | null>(null)
 	const progressRef = useRef<HTMLSpanElement>(null)
@@ -93,7 +89,6 @@ const Slideshow: FC = () => {
 		document.dispatchEvent(e)
 
 		toggleScroll(false)
-
 	}
 
 	const onToggleView = (detail: OnClickTileDetail) => {
@@ -101,12 +96,7 @@ const Slideshow: FC = () => {
 		document.dispatchEvent(e)
 
 		toggleScroll(detail.open)
-
-		console.log('detail.open', detail.open)
-
-
 	}
-
 
 	const fragmentShaderObj: { [key: string]: string } = {
 		'shapeShader': shapeShader,
@@ -123,7 +113,6 @@ const Slideshow: FC = () => {
 
 		window.addEventListener('resize', () => { onResize() })
 		document.addEventListener('toggleDetail', (({ detail }: CustomEvent) => onToggleView(detail)) as EventListener)
-
 
 		initScrollbar()
 		sceneRef.current = new Scene();
@@ -159,7 +148,6 @@ const Slideshow: FC = () => {
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : window.devicePixelRatio)
 
-
 		sceneRef.current.add(camera)
 		sceneRef.current.add(light);
 
@@ -170,7 +158,6 @@ const Slideshow: FC = () => {
 			renderer.setSize(window.innerWidth, window.innerHeight)
 			renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : window.devicePixelRatio)
 		}
-
 
 		const update = () => {
 			requestAnimationFrame(update)
@@ -220,7 +207,6 @@ const Slideshow: FC = () => {
 				</Canvas>
 			</Wrapper>
 		</main>
-
 	)
 };
 
@@ -270,7 +256,6 @@ const BackButtonWrapper = styled.div`
 	}
 `
 
-
 const Wrapper = styled.div`
 	position: relative;
 	flex-direction: column;
@@ -280,8 +265,6 @@ const Wrapper = styled.div`
 	align-items: center;
 	justify-content: center;
 	z-index: 9998;
-
-
 `
 
 const ScrollAreaCtn = styled.section`
@@ -289,7 +272,6 @@ const ScrollAreaCtn = styled.section`
 	z-index: 9997;
 	width: 100vw;
 `
-
 
 const ScrollArea = styled.div`
 	position: relative;
@@ -301,10 +283,6 @@ const SlideShowList = styled.ul`
 	display: flex;
 	align-items: center;
 	list-style: none;
-	/* display: block;
-			position: absolute; */
-
-
 `
 
 const SlideShowEl = styled.li`
@@ -312,17 +290,15 @@ const SlideShowEl = styled.li`
 	min-width: 30rem;
 	max-width: 40vmin;
 	margin-right: 30vw;
-position: relative;
+	position: relative;
 
+	&:nth-of-type(2n + 1) {
+		padding-top: 200px;
+	}
 
-&:nth-of-type(2n + 1) {
-	padding-top: 200px;
-}
-
-&:nth-of-type(2n) {
-	padding-bottom: 200px;
-}
-
+	&:nth-of-type(2n) {
+		padding-bottom: 200px;
+	}
 
 	&:first-of-type {
 		margin-left: 30vw;
