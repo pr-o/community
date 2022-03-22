@@ -1,34 +1,17 @@
-import React, { useEffect, useState, useRef, Fragment, FC, AnchorHTMLAttributes } from 'react';
 import { gsap } from 'gsap';
-
-import styled from '@emotion/styled';
-
-import THREE, {
+import {
 	Clock,
 	Scene,
-	Camera,
-	Light,
-	PerspectiveCamera,
-	AmbientLight,
-	Renderer,
-	LoadingManager,
 	TextureLoader,
 	Texture,
-	WebGLRenderer,
-	BoxBufferGeometry,
 	PlaneBufferGeometry,
-	BoxGeometry,
-	DoubleSide,
-	MeshBasicMaterial,
 	ShaderMaterial,
 	Mesh,
 	MeshPhongMaterial,
-	Vector2, Object3D,
+	Vector2
 } from 'three';
-import vertexShader from 'lib/glsl/vertexShader.glsl';
 import Scrollbar from 'smooth-scrollbar'
 import { getRatio } from 'utils/three';
-import { Collapse } from '@material-ui/core';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
@@ -54,8 +37,6 @@ export default class Slide {
 	mouse: any;
 	delta: number = 0;
 	hasClicked: boolean = false;
-	// index: number;
-	// selectedIndex: number = -1;
 	selected: boolean = false;
 	isZoomed: any = false;
 	loader: any;
@@ -77,8 +58,7 @@ export default class Slide {
 		this.title = title
 		this.subtitle = subtitle
 		this.detailsElement = $el.querySelector('#details')
-		// this.title = $el.querySelector('h2')
-		// this.subtitle = $el.querySelector('h3')
+
 		this.text = $el.querySelector('h4')
 		this.loader = new TextureLoader()
 		this.sizes = new Vector2(0, 0)
@@ -93,7 +73,6 @@ export default class Slide {
 		this.bindEvent()
 
 		this.preload(imagePaths, () => { this.init() })
-		// this.font = null;
 	}
 
 
@@ -295,16 +274,7 @@ export default class Slide {
 			ease: 'expo.inOut',
 		})
 
-
-
-
-
-
-
 	}
-
-
-
 
 	onMouseEnter() {
 		if (!this.mesh) return;
@@ -322,7 +292,6 @@ export default class Slide {
 	onMouseLeave() {
 
 		if (!this.mesh || this.isZoomed || this.hasClicked) return;
-
 
 		gsap.to(this.uniforms.u_progressHover, {
 			value: 0,

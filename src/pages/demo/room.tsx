@@ -2,8 +2,8 @@ import dynamic from 'next/dynamic';
 
 const Room = dynamic(() => import('components/Demo/Room/Room'), { ssr: false });
 
-const DonutPage = () => {
+const RoomPage = () => {
 	return <Room />;
 };
 
-export default DonutPage;
+export default RoomPage;
