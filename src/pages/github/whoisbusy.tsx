@@ -5,9 +5,8 @@ import { css, useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Header from 'components/Header/Header';
 import Footer from 'components/Footer/Footer';
-import { getOrdinalSuffix, sortObjectByCountProp } from 'utils/utils'
+import { getOrdinalSuffix, reduceReviewers } from 'utils/utils'
 import { Octokit } from '@octokit/core';
-
 interface CaptionRankingProps {
 	place: number;
 }
@@ -67,57 +66,10 @@ const WhoIsBusy = ({ data }: any) => {
 	const theme: any = useTheme();
 
 	useEffect(() => {
-		reduceReviewers(data);
+		const [sortedReviewers, sortedRequesters] = reduceReviewers(data)
+		setReviewers(sortedReviewers);
+		setRequesters(sortedRequesters);
 	}, [data]);
-
-	const reduceReviewers = (data: any) => {
-		const dataConcat: any[] = [].concat(...data);
-
-		let revs: any[] = [];
-		let reqs: any[] = [];
-
-		dataConcat.forEach((pr: any) => {
-			reqs = [...reqs, Object.assign(pr.user, { repo: pr.html_url })]
-			if (Object.keys(pr.requested_reviewers).length) {
-				pr.requested_reviewers.map((reviewer: any) => {
-					revs = [...revs, Object.assign(reviewer, { repo: pr.html_url })]
-				})
-			}
-		})
-
-		let reviewersObject: any = {};
-		let requestersObject: any = {};
-
-		revs.forEach(({ login, avatar_url, repo }) => {
-			reviewersObject = {
-				...reviewersObject,
-				[login]: {
-					login,
-					avatarUrl: avatar_url,
-					count: reviewersObject[login]?.count ? reviewersObject[login].count + 1 : 1,
-					repo: reviewersObject[login]?.repo.length ? [...new Set([...reviewersObject[login].repo, repo])] : [repo],
-				},
-			};
-		});
-
-		reqs.forEach(({ login, avatar_url, repo }) => {
-			requestersObject = {
-				...requestersObject,
-				[login]: {
-					login: login,
-					avatarUrl: avatar_url,
-					count: requestersObject[login]?.count ? requestersObject[login].count + 1 : 1,
-					repo: requestersObject[login]?.repo.length ? [...new Set([...requestersObject[login].repo, repo])] : [repo],
-				},
-			};
-		});
-
-		const sortedRevs = sortObjectByCountProp(reviewersObject)
-		const sortedReqs = sortObjectByCountProp(requestersObject)
-
-		setReviewers(sortedRevs);
-		setRequesters(sortedReqs);
-	};
 
 	return (
 		<div css={theme.body}>

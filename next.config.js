@@ -8,6 +8,11 @@ module.exports = {
 		return config;
 	},
 	images: {
-		domains: ['avatars.githubusercontent.com'],
+		domains: ['avatars.githubusercontent.com', 'raw.githubusercontent.com'],
+	},
+	experimental: {
+		runtime: 'nodejs',
+		serverComponents: true,
+		concurrentFeatures: true,
 	},
 };
