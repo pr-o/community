@@ -16,7 +16,6 @@ import {
 	preFooter,
 	footer,
 	margin10,
-	commentForm,
 } from './base';
 
 const theme = {
@@ -41,7 +40,6 @@ const theme = {
 	preFooter,
 	footer,
 	margin10,
-	commentForm,
 };
 
 export default theme;
