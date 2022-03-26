@@ -75,11 +75,11 @@ const Slideshow: FC = () => {
 
 		gsap.to(progressWrapperRef.current, { delay, duration, alpha, force3D: true });
 
-		gsap.delayedCall(duration, () => {
-			scrollbarRef.current?.updatePluginOptions('horizontalScroll', {
-				events: lock ? false : [/wheel/],
-			})
+
+		scrollbarRef.current?.updatePluginOptions('horizontalScroll', {
+			events: lock ? false : [/wheel/],
 		});
+
 
 		(backButtonRef?.current as HTMLDivElement)?.classList?.toggle('is-open', lock)
 	}
