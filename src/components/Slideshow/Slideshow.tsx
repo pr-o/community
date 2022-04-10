@@ -146,7 +146,7 @@ const Slideshow: FC = () => {
 		renderer.setClearAlpha(1)
 
 		renderer.setSize(window.innerWidth, window.innerHeight);
-		renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : window.devicePixelRatio)
+		renderer.setPixelRatio(window.devicePixelRatio)
 
 		sceneRef.current.add(camera)
 		sceneRef.current.add(light);
@@ -156,7 +156,7 @@ const Slideshow: FC = () => {
 			camera.updateProjectionMatrix()
 
 			renderer.setSize(window.innerWidth, window.innerHeight)
-			renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : window.devicePixelRatio)
+			renderer.setPixelRatio(window.devicePixelRatio)
 		}
 
 		const update = () => {
