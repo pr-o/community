@@ -75,11 +75,11 @@ const Slideshow: FC = () => {
 
 		gsap.to(progressWrapperRef.current, { delay, duration, alpha, force3D: true });
 
-		gsap.delayedCall(duration, () => {
-			scrollbarRef.current?.updatePluginOptions('horizontalScroll', {
-				events: lock ? false : [/wheel/],
-			})
+
+		scrollbarRef.current?.updatePluginOptions('horizontalScroll', {
+			events: lock ? false : [/wheel/],
 		});
+
 
 		(backButtonRef?.current as HTMLDivElement)?.classList?.toggle('is-open', lock)
 	}
@@ -146,7 +146,7 @@ const Slideshow: FC = () => {
 		renderer.setClearAlpha(1)
 
 		renderer.setSize(window.innerWidth, window.innerHeight);
-		renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : window.devicePixelRatio)
+		renderer.setPixelRatio(window.devicePixelRatio)
 
 		sceneRef.current.add(camera)
 		sceneRef.current.add(light);
@@ -156,7 +156,7 @@ const Slideshow: FC = () => {
 			camera.updateProjectionMatrix()
 
 			renderer.setSize(window.innerWidth, window.innerHeight)
-			renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : window.devicePixelRatio)
+			renderer.setPixelRatio(window.devicePixelRatio)
 		}
 
 		const update = () => {
