@@ -207,7 +207,7 @@ export default class Slide {
 		const duration = 1.2
 
 		const newScale = {
-			x: shouldZoom ? window.innerWidth * 0.5 : this.sizes.x,
+			x: shouldZoom ? window.innerWidth * 0.45 : this.sizes.x,
 			y: shouldZoom ? window.innerHeight - 150 : this.sizes.y,
 		}
 
