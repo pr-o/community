@@ -24,6 +24,11 @@ const CardsObj = [
 		thumbnail: "/images/lemon.jpg",
 		link: '/demo/room'
 	},
+	{
+		title: 'Annotation 2D',
+		thumbnail: "/images/lemon.jpg",
+		link: '/demo/annotation2d'
+	},
 ]
 
 const CardList = () => {

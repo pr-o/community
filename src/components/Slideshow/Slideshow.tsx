@@ -203,8 +203,7 @@ const Slideshow: FC = () => {
 						</button>
 					</BackButtonWrapper>
 				</Aside>
-				<Canvas ref={canvasRef} >
-				</Canvas>
+				<Canvas ref={canvasRef} />
 			</Wrapper>
 		</main>
 	)
