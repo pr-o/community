@@ -200,7 +200,6 @@ export default class Slide {
 
 	zoom({ target, open }: OnClickTileDetail) {
 
-
 		const shouldZoom = target === this
 
 		const delay = shouldZoom ? 0.4 : 0

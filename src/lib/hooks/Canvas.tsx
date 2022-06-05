@@ -8,13 +8,11 @@ export const Canvas = React.forwardRef<HTMLCanvasElement, any>(function Canvas(
 	forwardedRef,
 ) {
 
-	const containerRef = React.useRef<HTMLElement | null>(null)
-
 	const canvasRef = React.useRef<HTMLCanvasElement>(null!)
 
 	return (
 
-		<StyledCanvas id="stage" ref={mergeRefs([canvasRef, forwardedRef])}>
+		<StyledCanvas id="stage" ref={mergeRefs([canvasRef, forwardedRef])} {...props}>
 			{fallback}
 		</StyledCanvas>
 	)
